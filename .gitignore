@@ -1,0 +1,6 @@
+*.o
+docs
+README.md
+Silent_Pass
+test
+*.csv
