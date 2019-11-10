@@ -1,0 +1,6 @@
+#ifndef FIREFOX_LINUX_H
+#define FIREFOX_LINUX_H
+
+#define TRUE PR_TRUE
+
+#endif // FIREFOX_LINUX_H

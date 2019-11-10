@@ -9,7 +9,7 @@
 #include <openssl/evp.h>
 #include <openssl/err.h>
 
-#include "main.h"
+#include "args.h"
 #include "chrome.h"
 
 const SecretSchema * get_chrome_like_schema (void) G_GNUC_CONST;

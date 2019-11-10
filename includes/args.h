@@ -1,3 +1,6 @@
+#ifndef ARGS_H
+#define ARGS_H
+
 struct arguments {
 	enum {
 		ALL_MODE,
@@ -8,3 +11,5 @@ struct arguments {
 	char *output_file;
 	char *master_password;
 }; 
+
+#endif // ARGS_H

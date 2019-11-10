@@ -1,10 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <argp.h>
-
-#include "main.h"
-#include "firefox.h"
-#include "chrome.h"
+#include "args.h"
 
 const char *argp_program_version = "SilentPass 0.1";
 const char *argp_program_bug_address = "<silent@silent.com>";
@@ -20,8 +17,6 @@ static struct argp_option options[] = {
 	{"output", 'o', "FILE", 0, "Output file",1},	
 	{0,0,0,0,0,0}
 };
-
-
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
 	struct arguments *arguments = state->input;
@@ -63,39 +58,7 @@ static struct argp argp = {
 	0,0,0
 };
 
-int main(int argc, char** argv) {
-	struct arguments arguments;
-
-	// Default value
-	arguments.mode = ALL_MODE;
-	arguments.verbose = 0;
-	arguments.output_file = NULL;
-	arguments.master_password = NULL;
-
-	argp_parse(&argp, argc, argv, 0, 0, &arguments);
-
-	if(arguments.mode == ALL_MODE) {
-		puts("[*] All mode");
-		if(dump_firefox(&arguments) == -1) {
-			fprintf(stderr, "dump_firefox() failure\n");
-		}
-		if(dump_chrome(&arguments) == -1) {
-			fprintf(stderr, "dump_chrome() failure\n");
-		}
-	}
-	else if (arguments.mode == CHROME_MODE) {
-		puts("[*] Chrome mode");
-		if(dump_chrome(&arguments) == -1) {
-			fprintf(stderr, "dump_chrome() failure\n");
-		}
-
-	}
-	else if (arguments.mode == FIREFOX_MODE) {
-		puts("[*] Firefox mode");
-		if(dump_firefox(&arguments) == -1) {
-			fprintf(stderr, "dump_firefox() failure\n");
-		}
-	}
-
-	return 0;
+int parse_arguments(int argc, char **argv, struct arguments *arguments) {
+	argp_parse(&argp, argc, argv, 0, 0, arguments);
+	return 1;
 }
