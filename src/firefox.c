@@ -1,18 +1,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "cJSON.h"
+#include "args.h"
 #include "main.h"
 #include "firefox.h"
 #include "json.h"
-#include "args.h"
 
 // TODO:
 // - Choose the profile we want and not the default one (Profile0)
 
 int get_firefox_creds(char *profile_path, char *logins_path, char *output_file, char *master_password) {
-	void* key_slot; 
+	void* key_slot = NULL; 
 	if((nss_authenticate(profile_path, key_slot, master_password)) == -1) {
 		fprintf(stderr, "nss_authenticate failure()\n");
 		return -1;
@@ -51,29 +52,26 @@ int get_firefox_creds(char *profile_path, char *logins_path, char *output_file, 
 		cipher_username = cJSON_GetObjectItemCaseSensitive(logins, "encryptedUsername");	
 		cipher_password = cJSON_GetObjectItemCaseSensitive(logins, "encryptedPassword");	
 
-		if (
-				cJSON_IsString(cipher_username) && 
-				cJSON_IsString(cipher_password) && 
-				cJSON_IsString(hostname)
-		) {
+		if (cJSON_IsString(cipher_username) && cJSON_IsString(cipher_password) && cJSON_IsString(hostname)) {
+			if(strlen(hostname) > 0) {
+				decrypt_firefox_cipher(cipher_username->valuestring, &username);
+				decrypt_firefox_cipher(cipher_password->valuestring, &password);
 
-			decrypt_cipher(cipher_username->valuestring, &username);
-			decrypt_cipher(cipher_password->valuestring, &password);
-
-			printf("[*] Website: %s\n[+] Username: %s\n[+] Password: %s\n\n", 
-				hostname->valuestring,
-				username,
-				password);
-
-			if(output_file != NULL) {
-				fprintf(output, "\"%s\",\"%s\",\"%s\"\n", 
+				printf("[*] Website: %s\n[+] Username: %s\n[+] Password: %s\n\n", 
 					hostname->valuestring,
 					username,
 					password);
-			}
 
-			free(username);
-			free(password);
+				if(output_file != NULL) {
+					fprintf(output, "\"%s\",\"%s\",\"%s\"\n", 
+						hostname->valuestring,
+						username,
+						password);
+				}
+
+				free(username);
+				free(password);
+			}
 		}
 	}
 

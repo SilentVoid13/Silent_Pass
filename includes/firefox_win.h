@@ -43,4 +43,6 @@ fpPL_Base64Decode PL_Base64Decode;
 //typedef SECStatus (*SECItemFreeItem)(SECItem *, PRBool);
 //SECItemFreeItem SECItem_FreeItem;
 
+int load_firefox_libs();
+
 #endif // FIREFOX_WIN_H

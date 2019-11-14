@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <argp.h>
 
 #include "args.h"
 #include "main.h"
@@ -11,7 +10,7 @@ int main(int argc, char** argv) {
 	struct arguments arguments;
 
 	// Default value
-	arguments.mode = FIREFOX_MODE;
+	arguments.mode = ALL_MODE;
 	arguments.verbose = 0;
 	arguments.output_file = NULL;
 	arguments.master_password = NULL;

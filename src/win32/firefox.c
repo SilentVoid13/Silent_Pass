@@ -6,9 +6,10 @@
 #include <shlobj.h>
 #include <prtypes.h> 
 
+#include "args.h"
+#include "main.h"
 #include "firefox.h"
 #include "firefox_win.h"
-#include "args.h"
 
 // We define some variables to hold our functions
 NSSInit NSS_Init;
@@ -31,12 +32,12 @@ int load_firefox_libs() {
 	// We set our ENV PATH to load all libary dependencies.
 	char *path = getenv("PATH");
 	if (path){
-		sprintf(new_path, "PATH=%s;%s", path, pathFirefox);
+		snprintf(new_path, MAX_PATH, "PATH=%s;%s", path, pathFirefox);
 		_putenv(new_path);
 	}
 	path=getenv("PATH");
 
-        sprintf(pathDll, "%s\\%s", pathFirefox, "nss3.dll");
+        snprintf(pathDll, MAX_PATH, "%s\\%s", pathFirefox, "nss3.dll");
         if(!(moduleNSS = LoadLibrary(pathDll))) {
 		fprintf(stderr, "nss3.dll Loading failure\n");
                 return -1;
@@ -55,7 +56,7 @@ int load_firefox_libs() {
 	// Added
 	//SECItem_FreeItem = (SECItemFreeItem)GetProcAddress(moduleNSS, "SECItem_FreeItem");
 
-        return 0;
+        return 1;
 }
 
 int get_profile(char* profiles_ini_path, char* profile) {
@@ -72,7 +73,7 @@ int load_firefox_paths(char *firefox_path, char *profiles_ini_path) {
 	return 1;
 }
 
-int decrypt_cipher(char *ciphered, char **plaintext) {
+int decrypt_firefox_cipher(char *ciphered, char **plaintext) {
 	// TODO: See if we have the '=' char
 	// TODO: See if we can use NSSBase64_DecodeBuffer()
 	// TODO: See if we can use SECItem_FreeItem() to free items after we finished
@@ -84,7 +85,7 @@ int decrypt_cipher(char *ciphered, char **plaintext) {
 
 	request.data = malloc(len+1);
 	request.len = len;
-	memset(request.data, NULL, len + 1);
+	memset(request.data, 0x0, len + 1);
 
 	char *decoded_cipher = (char *)malloc(len+1);
 	if(decoded_cipher == 0) {

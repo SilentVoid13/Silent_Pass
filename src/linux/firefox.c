@@ -9,6 +9,7 @@
 #include "iniparser.h"
 
 #include "args.h"
+#include "main.h"
 #include "firefox.h"
 #include "firefox_linux.h"
 
@@ -39,9 +40,11 @@ int load_firefox_paths(char *firefox_path, char *profiles_ini_path) {
 	char *home = getenv("HOME");
 	snprintf(firefox_path, MAX_PATH, "%s/.mozilla/firefox", home);
 	snprintf(profiles_ini_path, MAX_PATH, "%s/profiles.ini", firefox_path);
+
+	return 1;
 }
 
-int decrypt_cipher(char *ciphered, char **plaintext) {
+int decrypt_firefox_cipher(char *ciphered, char **plaintext) {
 	SECItem *request;
 	SECItem *response;
 	unsigned int len = strlen(ciphered);

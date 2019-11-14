@@ -12,4 +12,6 @@ struct arguments {
 	char *master_password;
 }; 
 
+int parse_arguments(int argc, char **argv, struct arguments *arguments);
+
 #endif // ARGS_H
