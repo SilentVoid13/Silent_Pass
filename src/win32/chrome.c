@@ -52,21 +52,14 @@ int dpapi_decrypt(char *cipher_password, int len_cipher_password, char **plainte
 	return 1;
 }
 
-int aead_decrypt(char *cipher_password, int len_cipher_password, char *tag, char *key, char *iv, int len_iv, char **plaintext_password) {
+int aead_decrypt(char *cipher_password, int len_cipher_password, char *key, char *iv, int len_iv, char **plaintext_password) {
 	EVP_CIPHER_CTX *ctx;
 	int len;
 	int plaintext_len;
 
-	/* 
-	// Attempt to add manual padding
-
-	int padding = (16 -(len_cipher_password % 16));
-	int len_padded_cipher_password = len_cipher_password + padding;
-	char *padded_cipher_password = malloc(len_padded_cipher_password+1);
-	memset(padded_cipher_password, padding, len_padded_cipher_password);
-	memcpy(padded_cipher_password, cipher_password, len_cipher_password);
-	padded_cipher_password[len_padded_cipher_password] = '\0';
-	*/
+	int tag_offset = len_cipher_password-16;
+	// The tag is appended at the end of the cipher data
+	char *tag = cipher_password[tag_offset];
 
 	// Cipher_password len always greater or equal to plaintext
 	*plaintext_password = (unsigned char *)malloc(len_cipher_password);
@@ -94,21 +87,12 @@ int aead_decrypt(char *cipher_password, int len_cipher_password, char *tag, char
 		return -1;
 	}
 
-	/*
-	if(!EVP_DecryptInit_ex(ctx, EVP_aes_256_gcm(), NULL, key, iv)) {
-		fprintf(stderr, "EVP_DecryptInit_ex() failure\n");
-		ERR_print_errors_fp(stderr);
-		return -1;
-	}
-	*/
-
-	/* Tag looks useless
-	if(!EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, 16, tag)) {
+	// Set the expected tag value for authenticated data
+	if(!EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, 16, cipher_password+tag_offset)) {
 		fprintf(stderr, "EVP_CIPHER_CTX_ctrl() failure\n");
 		ERR_print_errors_fp(stderr);
 		return -1;
 	}
-	*/
 
 	/* Not useful since len_iv = 12
 	if(!EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN, len_iv, NULL)) {
@@ -118,31 +102,12 @@ int aead_decrypt(char *cipher_password, int len_cipher_password, char *tag, char
 	}	
 	*/
 
-	// Don't know if no padding is required or not.
-	//EVP_CIPHER_CTX_set_padding(ctx, 0);
-
-	/* 
-	// No aad data
-	if(!EVP_DecryptUpdate(ctx, NULL, &len, "", 0)) {
-		fprintf(stderr, "EVP_DecryptUpdate() failure\n");
-		return -1;
-	}
-	 */
-
-	if(!EVP_DecryptUpdate(ctx, *plaintext_password, &len, cipher_password, len_cipher_password)) {
-	//if(!EVP_DecryptUpdate(ctx, *plaintext_password, &len, padded_cipher_password, len_padded_cipher_password)) {
+	if(!EVP_DecryptUpdate(ctx, *plaintext_password, &len, cipher_password, tag_offset)) {
 		fprintf(stderr, "EVP_DecryptUpdate() failure\n");
 		ERR_print_errors_fp(stderr);
 		return -1;
 	}
 	
-	/*
-	// Always 16 bytes (block_size) at the end
-	printf("HEX: ");
-	for(int i = 0; i < len; i++) 
-		printf("%02x", (*plaintext_password)[i]);
-	printf("\n");
-	*/
 	plaintext_len = len;
 
 	if(1!=EVP_DecryptFinal_ex(ctx, *plaintext_password+len, &len)) {
@@ -152,9 +117,7 @@ int aead_decrypt(char *cipher_password, int len_cipher_password, char *tag, char
 	}
 
 	plaintext_len += len;
-	//(*plaintext_password)[plaintext_len] = '\0';
-	// FIXME: Temporary solution
-	(*plaintext_password)[plaintext_len - 16] = '\0';
+	(*plaintext_password)[plaintext_len] = '\0';
 	EVP_CIPHER_CTX_free(ctx);
 
 	return 1;
@@ -248,8 +211,6 @@ int decrypt_chrome_cipher(char *cipher_password, int len_cipher_password, char *
 		cipher_password = &(cipher_password[3]);
 		len_cipher_password -= 3;
 
-		// TODO: view tag size
-		char tag[16];
 		int len_iv = 96 / 8;
 		char iv[len_iv+1];
 		memcpy(iv, cipher_password, len_iv);
@@ -259,7 +220,7 @@ int decrypt_chrome_cipher(char *cipher_password, int len_cipher_password, char *
 		len_cipher_password -= len_iv;
 
 		// 3 - Decrypting the cipher_password
-		if(aead_decrypt(cipher_password, len_cipher_password, tag, masterkey, iv, len_iv, plaintext_password) == -1) {
+		if(aead_decrypt(cipher_password, len_cipher_password, masterkey, iv, len_iv, plaintext_password) == -1) {
 			fprintf(stderr, "aead_decrypt failure\n");
 			return -1;
 		}

@@ -21,10 +21,10 @@
 - [ ] Implement plain text / KWallet support
 ### Windows
 - [ ] Find a better way to check for the version prefix
-- [ ] Split decrypt_chrome_cipher() 
-- [ ] Fix aead_decrypt() problem
 - [ ] Add Argument Parsing
 - [ ] Fix cJSON segfault problem (or change JSON lib)
+- [x] Split decrypt_chrome_cipher() 
+- [x] Fix aead_decrypt() problem
 - [x] Fix masterkey problem
 - [x] Handle cipher text  padding
 
