@@ -57,9 +57,8 @@ int aead_decrypt(char *cipher_password, int len_cipher_password, char *key, char
 	int len;
 	int plaintext_len;
 
-	int tag_offset = len_cipher_password-16;
 	// The tag is appended at the end of the cipher data
-	char *tag = cipher_password[tag_offset];
+	int tag_offset = len_cipher_password-16;
 
 	// Cipher_password len always greater or equal to plaintext
 	*plaintext_password = (unsigned char *)malloc(len_cipher_password);

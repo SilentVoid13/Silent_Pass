@@ -5,7 +5,8 @@ struct arguments {
 	enum {
 		ALL_MODE,
 		FIREFOX_MODE,
-		CHROME_MODE
+		CHROME_MODE,
+		SPECIFIC_MODE
 	} mode;
 	int verbose;
 	char *output_file;

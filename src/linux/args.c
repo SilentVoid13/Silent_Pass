@@ -13,6 +13,7 @@ static struct argp_option options[] = {
 	{"all", 'a', 0, 0, "Harvest all browsers credentials",0},	
 	{"firefox", 'f', 0, 0, "Harvest Firefox credentials",0},	
 	{"chrome", 'c', 0, 0, "Harvest Chrome-like credentials",0},	
+	{"specific", 's', 0, 0, "Harvest OS Specific browsers credentials (No Specific OS browser for Linux for now)",0},	
 	{"master-password", 'm', "PASSWORD", 0, "Master password to decrypt passwords (Firefox only for now)",1},	
 	{"output", 'o', "FILE", 0, "Output file",1},	
 	{0,0,0,0,0,0}
@@ -32,6 +33,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
 			break;
 		case 'c':
 			arguments->mode = CHROME_MODE;
+			break;
+		case 's':
+			arguments->mode = SPECIFIC_MODE;
 			break;
 		case 'o':
 			arguments->output_file = arg;

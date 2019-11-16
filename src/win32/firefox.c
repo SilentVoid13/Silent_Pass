@@ -20,12 +20,12 @@ PK11Authenticate PK11_Authenticate;
 PK11CheckUserPassword PK11_CheckUserPassword;
 NSSShutdown NSS_Shutdown;
 PK11FreeSlot PK11_FreeSlot;
+HMODULE moduleNSS;
 
 int load_firefox_libs() {
         char pathFirefox[MAX_PATH];
         char pathDll[MAX_PATH];
         char new_path[MAX_PATH];
-        HMODULE moduleNSS;
         SHGetSpecialFolderPath(0, pathFirefox, CSIDL_PROGRAM_FILES, FALSE);
         strcat(pathFirefox, "\\Mozilla Firefox");
 
@@ -55,6 +55,12 @@ int load_firefox_libs() {
 
 	// Added
 	//SECItem_FreeItem = (SECItemFreeItem)GetProcAddress(moduleNSS, "SECItem_FreeItem");
+
+	if(!NSS_Init || !PK11_GetInternalKeySlot || !PK11_Authenticate || !PK11SDR_Decrypt || !PL_Base64Decode || !PK11_CheckUserPassword || !NSS_Shutdown || !PK11_FreeSlot) {
+		fprintf(stderr, "GetProcAddress() failure\n");
+		FreeLibrary(moduleNSS);
+		return -1;
+	}
 
         return 1;
 }
@@ -165,4 +171,5 @@ int nss_authenticate(char *profile_path, void *key_slot, char *master_password) 
 void free_pk11_nss(void *key_slot) {
 	PK11_FreeSlot(&key_slot);
 	NSS_Shutdown();
+	FreeLibrary(moduleNSS);
 }
