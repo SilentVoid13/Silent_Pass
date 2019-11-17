@@ -8,7 +8,6 @@
 #include "pk11sdr.h"
 #include "iniparser.h"
 
-#include "args.h"
 #include "main.h"
 #include "firefox.h"
 #include "firefox_linux.h"

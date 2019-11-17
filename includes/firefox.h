@@ -1,7 +1,7 @@
 #ifndef FIREFOX_H
 #define FIREFOX_H
 
-int dump_firefox(struct arguments *args);
+int dump_firefox(int verbose, char *output_file, char *master_password);
 int get_firefox_creds(char *profile_path, char *logins_path, char *output_file, char *master_password); 
 int get_profile(char* profiles_ini_path, char* profile);
 int load_firefox_paths(char *firefox_path, char *profiles_ini_path);

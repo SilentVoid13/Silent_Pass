@@ -9,8 +9,8 @@ INCLUDE= -I. -Isrc -Ilib -Iincludes -I/usr/include/nss -I/usr/include/nspr
 SRC_FILES := $(wildcard lib/argp/*.c)
 OBJ_FILES := $(patsubst lib/argp/%.c,./%.o,$(SRC_FILES))
 
-LINUX_LIBS= -lssl -lcrypto -l nspr4 -l nss3 -l iniparser -ldl 
-WINDOWS_LIBS = -lcrypt32 -lws2_32 -lgdi32 
+LINUX_LIBS= -lssl -lcrypto -l nspr4 -l nss3 -l iniparser -ldl -lm
+WINDOWS_LIBS = -lcrypt32 -lws2_32 -lgdi32 -lm
 
 NORMAL_FILES := $(wildcard src/*.c) $(wildcard lib/*.c) $(wildcard src/utilities/*.c)
 LINUX_FILES := $(wildcard src/linux/*.c)

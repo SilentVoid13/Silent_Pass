@@ -3,8 +3,6 @@
 #include <shlobj.h>
 #include <prtypes.h> 
 
-#include "args.h"
-
 #ifndef EXPLORER_H
 #define EXPLORER_H
 
@@ -90,9 +88,9 @@ typedef DWORD(WINAPI *VaultFree_t)(PVOID mem);
 typedef DWORD(WINAPI * VaultGetItem_t) (HANDLE vault, LPGUID SchemaId, PVAULT_ITEM_DATA Resource, PVAULT_ITEM_DATA Identity, PVAULT_ITEM_DATA PackageSid, HWND hWnd, DWORD Flags, PVAULT_ITEM * pItem);
 
 
-int load_ie10_msedge_libs();
-int get_ie10_msedge_creds(char *output_file);
-int dump_explorer(struct arguments *args);
+int load_ie_vault_libs();
+int get_ie_vault_creds(char *output_file);
+int dump_explorer(int verbose, char *output_file);
 
 
 #endif // EXPLORER_H

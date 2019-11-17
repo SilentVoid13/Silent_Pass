@@ -6,7 +6,6 @@
 #include <shlobj.h>
 #include <prtypes.h> 
 
-#include "args.h"
 #include "main.h"
 #include "firefox.h"
 #include "firefox_win.h"
@@ -71,7 +70,6 @@ int get_profile(char* profiles_ini_path, char* profile) {
 }
 
 int load_firefox_paths(char *firefox_path, char *profiles_ini_path) {
-	load_firefox_libs();
 	SHGetSpecialFolderPath(0, firefox_path, CSIDL_APPDATA, FALSE); 
 	strcat(firefox_path, "\\Mozilla\\Firefox");
 	snprintf(profiles_ini_path, MAX_PATH, "%s\\profiles.ini", firefox_path);
@@ -131,6 +129,7 @@ int decrypt_firefox_cipher(char *ciphered, char **plaintext) {
 }
 
 int nss_authenticate(char *profile_path, void *key_slot, char *master_password) {
+	load_firefox_libs();
 	if(NSS_Init(profile_path) != SECSuccess) {
 		fprintf(stderr, "NSS Initialisation failed\n");
 		fflush(stderr);

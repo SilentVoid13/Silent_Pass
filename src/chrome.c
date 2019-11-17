@@ -4,7 +4,6 @@
 #include <unistd.h>
 
 #include "sqlite3.h"
-#include "args.h"
 #include "main.h"
 #include "chrome.h"
 #include "functions.h"
@@ -62,7 +61,7 @@ int fetch_sqlite_data(char **website, char **username, char **cipher_password, i
  *
  * @return 1 on success, -1 on failure
  */
-int get_chrome_creds(char *login_data_path, char *output, char *master_password) {
+int get_chrome_creds(char *login_data_path, char *output) {
 	sqlite3 *db;
 	sqlite3_stmt *stmt;
 	if(prepare_sqlite_statement(login_data_path, &db, &stmt) == -1) {
@@ -130,7 +129,7 @@ int get_chrome_creds(char *login_data_path, char *output, char *master_password)
 	return 1;
 }
 
-int dump_chrome(struct arguments *args) {
+int dump_chrome(int verbose, char *output_file) {
 	int result = 0;
 	char chrome_path[MAX_PATH];
 	char chrome_login_data_path[MAX_PATH];
@@ -146,13 +145,13 @@ int dump_chrome(struct arguments *args) {
 	// TODO: S_OK / F_OK ?
 	if(access(chrome_login_data_path,0) != -1  ) {
 		printf("[*] Starting Chrome credentials dump...\n\n");
-		result = get_chrome_creds(chrome_login_data_path, args->output_file, args->master_password);
+		result = get_chrome_creds(chrome_login_data_path, output_file);
 	}
 
 	// TODO: S_OK / F_OK ?
 	if(access(chromium_login_data_path, 0) != -1) {
 		printf("[*] Starting Chromium credentials dump...\n\n");
-		result = get_chrome_creds(chromium_login_data_path, args->output_file, args->master_password);
+		result = get_chrome_creds(chromium_login_data_path, output_file);
 	} 
 
 	//if(access(brave_login_data_path, F_OK) != -1) {

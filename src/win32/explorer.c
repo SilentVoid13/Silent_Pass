@@ -6,7 +6,6 @@
 #include <shlobj.h>
 #include <prtypes.h> 
 
-#include "args.h"
 #include "main.h"
 #include "explorer.h"
 
@@ -18,7 +17,12 @@ VaultCloseVault_t VaultCloseVault = NULL;
 VaultFree_t VaultFree = NULL;
 HMODULE module_vault;
 
-int load_ie10_msedge_libs() {
+
+int get_ie_registry_creds() {
+
+}
+
+int load_ie_vault_libs() {
 	module_vault = LoadLibrary("vaultcli.dll");
 	if(module_vault == NULL) {
 		fprintf(stderr, "LoadLibary() failure\n");
@@ -41,8 +45,8 @@ int load_ie10_msedge_libs() {
 	return 1;
 }
 
-int get_ie10_msedge_creds(char *output_file) {
-	if(load_ie10_msedge_libs() == -1) {
+int get_ie_vault_creds(char *output_file) {
+	if(load_ie_vault_libs() == -1) {
 		fprintf(stderr, "load_explorer_libs() failure\n");
 		return -1;
 	}
@@ -111,10 +115,10 @@ int get_ie10_msedge_creds(char *output_file) {
 	return 1;
 }
 
-int dump_explorer(struct arguments *args) {
+int dump_explorer(int verbose, char *output_file) {
 	puts("[*] Starting IE10 / MSEdge dump...\n");
-	if(get_ie10_msedge_creds(args->output_file) == -1) {
-		fprintf(stderr, "get_ie10_msedge_creds() failure\n");
+	if(get_ie_vault_creds(output_file) == -1) {
+		fprintf(stderr, "get_ie_vault_creds() failure\n");
 	}
 
 	//printf("[*] Starting IE7-IE9 dump...\n");

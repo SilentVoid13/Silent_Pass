@@ -4,7 +4,6 @@
 #include <unistd.h>
 
 #include "cJSON.h"
-#include "args.h"
 #include "main.h"
 #include "firefox.h"
 #include "json.h"
@@ -85,7 +84,7 @@ int get_firefox_creds(char *profile_path, char *logins_path, char *output_file, 
 	return 1;
 }
 
-int dump_firefox(struct arguments *args) {
+int dump_firefox(int verbose, char *output_file, char *master_password) {
 	int result = 0;
 	char firefox_path[MAX_PATH];
 	char profiles_ini_path[MAX_PATH];
@@ -106,7 +105,7 @@ int dump_firefox(struct arguments *args) {
 	// TODO: S_OK / F_OK
 	if(access(logins_path, 0) != -1) {
 		printf("[*] Starting Firefox credentials dump\n\n");
-		result = get_firefox_creds(profile_path, logins_path, args->output_file, args->master_password);
+		result = get_firefox_creds(profile_path, logins_path, output_file, master_password);
 	}
 
 	if(result == -1) {

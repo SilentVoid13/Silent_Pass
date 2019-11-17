@@ -6,14 +6,13 @@
 #include <shlobj.h>
 #include <prtypes.h> 
 
-#include "args.h"
 #include "main.h"
 #include "explorer.h"
 
-int dump_specific(struct arguments *args) {
+int dump_specific(int verbose, char *output_file) {
 	puts("[*] Starting OS Specific dump...");
 
-	if(dump_explorer(args) == -1) {
+	if(dump_explorer(verbose, output_file) == -1) {
 		fprintf(stderr, "dump_explorer() failure\n");
 	}
 

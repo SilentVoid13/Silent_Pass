@@ -1,8 +1,6 @@
 # TODO List
 
-
 ## Globals 
-- [ ] Add Argument Parsing for Windows
 - [ ] Add MAC OSX Support
 - [ ] Add FileZilla support
 - [ ] Add Opera support
@@ -11,6 +9,7 @@
 - [ ] Handle Windows arguments parsing
 - [ ] Make clean Makefile (cMake ?)
 - [ ] Refactor functions (parameter names, ...)
+- [x] Add Argument Parsing for Windows
 - [x] Add Microsoft Edge - IE10 support
 - [x] Handle empty entries (only website entries / nothing)
 - [x] Add all functions to header files
