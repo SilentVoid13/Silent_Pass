@@ -9,9 +9,7 @@
 #include "main.h"
 #include "explorer.h"
 
-int dump_specific(int verbose, char *output_file) {
-	puts("[*] Starting OS Specific dump...");
-
+int dump_specific(int verbose, const char *output_file) {
 	if(dump_explorer(verbose, output_file) == -1) {
 		fprintf(stderr, "dump_explorer() failure\n");
 	}

@@ -37,8 +37,8 @@ int get_profile(char* profiles_ini_path, char* profile) {
 
 int load_firefox_paths(char *firefox_path, char *profiles_ini_path) {
 	char *home = getenv("HOME");
-	snprintf(firefox_path, MAX_PATH, "%s/.mozilla/firefox", home);
-	snprintf(profiles_ini_path, MAX_PATH, "%s/profiles.ini", firefox_path);
+	snprintf(firefox_path, MAX_PATH_SIZE, "%s/.mozilla/firefox", home);
+	snprintf(profiles_ini_path, MAX_PATH_SIZE, "%s/profiles.ini", firefox_path);
 
 	return 1;
 }
@@ -67,7 +67,7 @@ int decrypt_firefox_cipher(char *ciphered, char **plaintext) {
 	return 1;
 }
 
-int nss_authenticate(char *profile_path, void *key_slot, char *master_password) {
+int nss_authenticate(char *profile_path, void *key_slot, const char *master_password) {
 	if(NSS_Init(profile_path) != SECSuccess) {
 		fprintf(stderr, "NSS Initialisation failed\n");
 		fflush(stderr);

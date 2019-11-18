@@ -75,7 +75,7 @@ int get_gnome_masterkey(char *login_data_path, char **masterkey) {
  * 
  * @return 1 on success, -1 on failure
  */
-int aes_decrypt(EVP_CIPHER_CTX *ctx, char *cipher_password, int len_cipher_password, char **plaintext_password, char *iv, char *output_key) {
+int aes_decrypt(EVP_CIPHER_CTX *ctx, char *cipher_password, int len_cipher_password, char **plaintext_password, char *iv, unsigned char *output_key) {
 	int len;
 	int plaintext_len;
 	
@@ -137,7 +137,7 @@ int get_masterkey(char *login_data_path, char **masterkey) {
 int decrypt_gnome_cipher(char *cipher_password, int len_cipher_password, char **plaintext_password, char *masterkey) {
 	// TODO: No need to recalculate the key every time. 
 	// 2 - We get the PBKDF2 key 
-	char output_key[KEY_LENGTH];
+	unsigned char output_key[KEY_LENGTH];
 	char *salt = "saltysalt";
 	if(PKCS5_PBKDF2_HMAC(masterkey, strlen(masterkey), salt, strlen(salt), 1, EVP_sha1(), KEY_LENGTH, output_key) == 0) {
 		fprintf(stderr, "PKCS5_PBKDF2_HMAC() failure\n");
@@ -170,11 +170,11 @@ int decrypt_chrome_cipher(char *cipher_password, int len_cipher_password, char *
 
 int load_chrome_paths(char *chrome_path, char *chrome_login_data_path, char *chromium_path, char *chromium_login_data_path) {
 	char *home = getenv("HOME");
-	snprintf(chrome_path, MAX_PATH, "%s/.config/google-chrome/Default", home);
-	snprintf(chrome_login_data_path, MAX_PATH, "%s/Login Data", chrome_path);
-	snprintf(chromium_path, MAX_PATH, "%s/.config/chromium/Default", home);
-	snprintf(chromium_login_data_path, MAX_PATH, "%s/Login Data", chromium_path);
-	//snprintf(brave_path, MAX_PATH, "%s/.config/BraveSoftware/Brave-Browser/Default", home);
+	snprintf(chrome_path, MAX_PATH_SIZE, "%s/.config/google-chrome/Default", home);
+	snprintf(chrome_login_data_path, MAX_PATH_SIZE, "%s/Login Data", chrome_path);
+	snprintf(chromium_path, MAX_PATH_SIZE, "%s/.config/chromium/Default", home);
+	snprintf(chromium_login_data_path, MAX_PATH_SIZE, "%s/Login Data", chromium_path);
+	//snprintf(brave_path, MAX_PATH_SIZE, "%s/.config/BraveSoftware/Brave-Browser/Default", home);
 	//snprintf(brave_login_data_path, "%s/Login Data", brave_path);
 	
 	return 1;

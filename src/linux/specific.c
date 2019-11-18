@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-int dump_specific(int verbose, char *output_file) {
+int dump_specific(int verbose, const char *output_file) {
 	puts("[*] Starting OS Specific dump...");
 	puts("[-] Linux does not have any OS Specific browsers");
 

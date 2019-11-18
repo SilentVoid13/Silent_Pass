@@ -22,21 +22,21 @@ PK11FreeSlot PK11_FreeSlot;
 HMODULE moduleNSS;
 
 int load_firefox_libs() {
-        char pathFirefox[MAX_PATH];
-        char pathDll[MAX_PATH];
-        char new_path[MAX_PATH];
+        char pathFirefox[MAX_PATH_SIZE];
+        char pathDll[MAX_PATH_SIZE];
+        char new_path[MAX_PATH_SIZE];
         SHGetSpecialFolderPath(0, pathFirefox, CSIDL_PROGRAM_FILES, FALSE);
         strcat(pathFirefox, "\\Mozilla Firefox");
 
 	// We set our ENV PATH to load all libary dependencies.
 	char *path = getenv("PATH");
 	if (path){
-		snprintf(new_path, MAX_PATH, "PATH=%s;%s", path, pathFirefox);
+		snprintf(new_path, MAX_PATH_SIZE, "PATH=%s;%s", path, pathFirefox);
 		_putenv(new_path);
 	}
 	path=getenv("PATH");
 
-        snprintf(pathDll, MAX_PATH, "%s\\%s", pathFirefox, "nss3.dll");
+        snprintf(pathDll, MAX_PATH_SIZE, "%s\\%s", pathFirefox, "nss3.dll");
         if(!(moduleNSS = LoadLibrary(pathDll))) {
 		fprintf(stderr, "nss3.dll Loading failure\n");
                 return -1;
@@ -65,14 +65,14 @@ int load_firefox_libs() {
 }
 
 int get_profile(char* profiles_ini_path, char* profile) {
-	GetPrivateProfileString("Profile0", "Path", "", profile, MAX_PATH, profiles_ini_path);
+	GetPrivateProfileString("Profile0", "Path", "", profile, MAX_PATH_SIZE, profiles_ini_path);
 	return 1;
 }
 
 int load_firefox_paths(char *firefox_path, char *profiles_ini_path) {
 	SHGetSpecialFolderPath(0, firefox_path, CSIDL_APPDATA, FALSE); 
 	strcat(firefox_path, "\\Mozilla\\Firefox");
-	snprintf(profiles_ini_path, MAX_PATH, "%s\\profiles.ini", firefox_path);
+	snprintf(profiles_ini_path, MAX_PATH_SIZE, "%s\\profiles.ini", firefox_path);
 
 	return 1;
 }
@@ -94,6 +94,8 @@ int decrypt_firefox_cipher(char *ciphered, char **plaintext) {
 	char *decoded_cipher = (char *)malloc(len+1);
 	if(decoded_cipher == 0) {
 		fprintf(stderr, "malloc() failure\n");
+		free(request.data);
+		free(decoded_cipher);
 		return -1;
 	}
 	memset(decoded_cipher, NULL, len+1);
@@ -103,6 +105,7 @@ int decrypt_firefox_cipher(char *ciphered, char **plaintext) {
 
 	if(PL_Base64Decode(ciphered, strlen(ciphered), decoded_cipher) == 0) {
 		fprintf(stderr, "PL_Base64Decode() failure\n");
+		free(request.data);
 		return -1;
 	}
 	memcpy(request.data, decoded_cipher, len);
@@ -128,7 +131,7 @@ int decrypt_firefox_cipher(char *ciphered, char **plaintext) {
 	return 1;
 }
 
-int nss_authenticate(char *profile_path, void *key_slot, char *master_password) {
+int nss_authenticate(char *profile_path, void *key_slot, const char *master_password) {
 	load_firefox_libs();
 	if(NSS_Init(profile_path) != SECSuccess) {
 		fprintf(stderr, "NSS Initialisation failed\n");

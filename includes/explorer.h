@@ -6,6 +6,11 @@
 #ifndef EXPLORER_H
 #define EXPLORER_H
 
+#define URL_MAX_SIZE 150
+#define MAX_HASH_SIZE 1024
+#define MAX_URL_HISTORY 50
+#define CIPHER_SIZE_MAX 5000
+
 typedef HANDLE HVAULT;
 
 enum VAULT_ELEMENT_TYPE {
@@ -77,8 +82,6 @@ typedef struct _VAULT_ITEM_7 {
 	PVAULT_ITEM_DATA Properties;
 } VAULT_ITEM_7, *PVAULT_ITEM_7;
 
-
-
 typedef DWORD(WINAPI *VaultEnumerateVaults_t)(DWORD flags, PDWORD count, GUID **guids);
 typedef DWORD(WINAPI *VaultEnumerateItems_t)(HVAULT handle, DWORD flags, PDWORD count, PVOID *items);
 typedef DWORD(WINAPI *VaultOpenVault_t)(GUID *id, DWORD flags, HVAULT *handle);
@@ -87,10 +90,22 @@ typedef DWORD(WINAPI *VaultFree_t)(PVOID mem);
 //typedef unsigned int (__stdcall *VaultGetItem_t)(void *VaultHandle, GUID *pSchemaId, vault_entry_s *pResource, vault_entry_s *pIdentity, vault_entry_s *pPackageSid, HWND *hwndOwner, unsigned int dwFlags, vault_cred_s **ppItem);
 typedef DWORD(WINAPI * VaultGetItem_t) (HANDLE vault, LPGUID SchemaId, PVAULT_ITEM_DATA Resource, PVAULT_ITEM_DATA Identity, PVAULT_ITEM_DATA PackageSid, HWND hWnd, DWORD Flags, PVAULT_ITEM * pItem);
 
+typedef struct {
+	wchar_t utf_url[URL_MAX_SIZE];
+	char url[URL_MAX_SIZE];
+} IEUrl;
 
 int load_ie_vault_libs();
-int get_ie_vault_creds(char *output_file);
-int dump_explorer(int verbose, char *output_file);
+int get_ie_vault_creds(const char *output_file);
+int dump_explorer(int verbose, const char *output_file);
+int dpapi_decrypt_entropy(char *cipher_data, int len_cipher_data, wchar_t *entropy_password, int len_entropy_password, char **plaintext_data);
+int get_registry_history(IEUrl *urls, int *n_urls, int nHowMany);
+void get_url_hash(wchar_t *wstrURL, char *strHash, int dwSize); 
+int get_ie_history();
+void add_known_websites(IEUrl *urls, int *n_urls);
+int get_ie_registry_creds(const char *output_file);
+int print_decrypted_data(char *decrypted_data, char *url, const char *output_file);
+
 
 
 #endif // EXPLORER_H

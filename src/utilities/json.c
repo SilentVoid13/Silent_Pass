@@ -18,6 +18,7 @@ int parse_json(char *path, char **json) {
 	if(*json == 0) {
 		fprintf(stderr, "malloc() failure\n");
 		free(*json);
+		fclose(f);
 		return -1;
 	}
 	fread(*json, 1, fsize, f);

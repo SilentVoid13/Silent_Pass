@@ -11,7 +11,7 @@
 // TODO:
 // - Choose the profile we want and not the default one (Profile0)
 
-int get_firefox_creds(char *profile_path, char *logins_path, char *output_file, char *master_password) {
+int get_firefox_creds(char *profile_path, char *logins_path, const char *output_file, const char *master_password) {
 	void* key_slot = NULL; 
 	if((nss_authenticate(profile_path, key_slot, master_password)) == -1) {
 		fprintf(stderr, "nss_authenticate failure()\n");
@@ -84,13 +84,14 @@ int get_firefox_creds(char *profile_path, char *logins_path, char *output_file, 
 	return 1;
 }
 
-int dump_firefox(int verbose, char *output_file, char *master_password) {
+int dump_firefox(int verbose, const char *output_file, const char *master_password) {
+	puts("[*] Starting Firefox dump...");
 	int result = 0;
-	char firefox_path[MAX_PATH];
-	char profiles_ini_path[MAX_PATH];
-	char profile[MAX_PATH];
-	char profile_path[MAX_PATH];
-	char logins_path[MAX_PATH];
+	char firefox_path[MAX_PATH_SIZE];
+	char profiles_ini_path[MAX_PATH_SIZE];
+	char profile[MAX_PATH_SIZE];
+	char profile_path[MAX_PATH_SIZE];
+	char logins_path[MAX_PATH_SIZE];
 
 	load_firefox_paths(firefox_path, profiles_ini_path);
 
@@ -99,8 +100,8 @@ int dump_firefox(int verbose, char *output_file, char *master_password) {
 		return -1;
 	}
 
-	snprintf(profile_path, MAX_PATH, "%s%s%s", firefox_path, "/", profile);
-	snprintf(logins_path, MAX_PATH, "%s/logins.json", profile_path);
+	snprintf(profile_path, MAX_PATH_SIZE, "%s%s%s", firefox_path, "/", profile);
+	snprintf(logins_path, MAX_PATH_SIZE, "%s/logins.json", profile_path);
 	
 	// TODO: S_OK / F_OK
 	if(access(logins_path, 0) != -1) {
