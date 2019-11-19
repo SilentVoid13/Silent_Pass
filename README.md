@@ -34,7 +34,7 @@ Usage: Silent_Pass [-hVvafcs] [-m password] [-o myfile]
   -o, --output=myfile       Ouput file
 ```
 
-Master Password can only be used with Firefox (other browsers doesn't implement it).
+Master Password can only be used with Firefox (other browsers don't implement it).
 
 Output file format is in CSV.
 
@@ -42,7 +42,7 @@ Output file format is in CSV.
 
 You can either get the compiled version from the latest release, from the bin directory, or compile it yourself.
 
-You can build the Windows binary using mingw (i686-w64-mingw32-gcc). No 32 bits version for Linux is currently available.
+You can build the Windows binary using mingw (i686-w64-mingw32-gcc). No 32 bit version for Linux is currently available.
 
 Compiling time can be quite long because of the various dependencies (~1 min)
 
@@ -62,7 +62,7 @@ Compiled binaries will be available in the bin directory.
 
 ## Dependencies
 
-Currently Silent_Pass relies on the following dependencies :
+Currently, Silent_Pass relies on the following dependencies :
 
 - OpenSSL
 - libsecret
