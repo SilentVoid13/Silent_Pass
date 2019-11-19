@@ -1,6 +1,5 @@
 *.o
 docs
-README.md
 RESOURCES.md
 Silent_Pass
 silent*
