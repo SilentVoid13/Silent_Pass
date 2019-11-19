@@ -8,9 +8,11 @@
 #include "firefox.h"
 #include "json.h"
 
-// TODO:
-// - Choose the profile we want and not the default one (Profile0)
-
+/**
+ * Main function to dump firefox creds
+ *
+ * @return 1 on success, -1 on failure 
+ */
 int get_firefox_creds(char *profile_path, char *logins_path, const char *output_file, const char *master_password) {
 	void* key_slot = NULL; 
 	if((nss_authenticate(profile_path, key_slot, master_password)) == -1) {
@@ -84,6 +86,11 @@ int get_firefox_creds(char *profile_path, char *logins_path, const char *output_
 	return 1;
 }
 
+/**
+ * Firefox functions wrapper that sets up everything we need
+ *
+ * @return 1 on success, -1 on failure 
+ */
 int dump_firefox(int verbose, const char *output_file, const char *master_password) {
 	puts("[*] Starting Firefox dump...");
 	int result = 0;

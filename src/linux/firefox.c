@@ -12,10 +12,11 @@
 #include "firefox.h"
 #include "firefox_linux.h"
 
-// TODO:
-// - Choose the profile we want and not the default one (Profile0)
-// - Enable Master Password
-
+/**
+ * Get the Linux Firefox profile
+ *
+ * @return 1 on success, -1 on failure 
+ */
 int get_profile(char* profiles_ini_path, char* profile) {
 	dictionary* ini;
 	// We parse the ini file
@@ -35,6 +36,11 @@ int get_profile(char* profiles_ini_path, char* profile) {
 	return 1;
 }
 
+/**
+ * Load linux Firefox paths
+ *
+ * @return 1 on success, -1 on failure 
+ */
 int load_firefox_paths(char *firefox_path, char *profiles_ini_path) {
 	char *home = getenv("HOME");
 	snprintf(firefox_path, MAX_PATH_SIZE, "%s/.mozilla/firefox", home);
@@ -43,6 +49,11 @@ int load_firefox_paths(char *firefox_path, char *profiles_ini_path) {
 	return 1;
 }
 
+/**
+ * Decrypt the Firefox ciphered password
+ *
+ * @return 1 on success, -1 on failure 
+ */
 int decrypt_firefox_cipher(char *ciphered, char **plaintext) {
 	SECItem *request;
 	SECItem *response;
@@ -67,6 +78,11 @@ int decrypt_firefox_cipher(char *ciphered, char **plaintext) {
 	return 1;
 }
 
+/**
+ * Authenticate via NSS to be able to query passwords
+ *
+ * @return 1 on success, -1 on failure
+ */
 int nss_authenticate(char *profile_path, void *key_slot, const char *master_password) {
 	if(NSS_Init(profile_path) != SECSuccess) {
 		fprintf(stderr, "NSS Initialisation failed\n");
@@ -105,6 +121,11 @@ int nss_authenticate(char *profile_path, void *key_slot, const char *master_pass
 	return 1;
 }
 
+/**
+ * Free PK11 / NSS Functions
+ *
+ * @return 
+ */
 void free_pk11_nss(void *key_slot) {
 	PK11_FreeSlot(&key_slot);
 	NSS_Shutdown();

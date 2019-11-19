@@ -21,20 +21,15 @@
 #include <openssl/kdf.h>
 #include <openssl/bio.h>
 
-#include <assert.h>
-
+/**
+ * DPAPI decrypt with any password (user password)
+ *
+ * @return 1 on success, -1 on failure 
+ */
 int dpapi_decrypt(char *cipher_password, int len_cipher_password, char **plaintext_password) {
 	DATA_BLOB encrypted_blob, decrypted_blob;
 	encrypted_blob.cbData = len_cipher_password;
-	encrypted_blob.pbData = (byte *)malloc((int)encrypted_blob.cbData);
-	if(encrypted_blob.pbData == 0) {
-		fprintf(stderr, "malloc() failure\n");
-		free(encrypted_blob.pbData);
-		return -1;
-	}
-	memcpy(encrypted_blob.pbData, cipher_password, (int)encrypted_blob.cbData);
-	decrypted_blob.pbData = NULL;
-	//decrypted_blob.cbData = 0;
+	encrypted_blob.pbData = cipher_password; 
 
 	if(!CryptUnprotectData(&encrypted_blob, NULL, NULL, NULL, NULL, 0, &decrypted_blob)) {
 		fprintf(stderr, "CryptUnprotectData() failure\n");
@@ -52,6 +47,11 @@ int dpapi_decrypt(char *cipher_password, int len_cipher_password, char **plainte
 	return 1;
 }
 
+/**
+ * AEAD decrypting function (with no IV len)
+ *
+ * @return 1 on success, -1 on failure 
+ */
 int aead_decrypt(char *cipher_password, int len_cipher_password, char *key, char *iv, int len_iv, char **plaintext_password) {
 	EVP_CIPHER_CTX *ctx;
 	int len;
@@ -122,6 +122,11 @@ int aead_decrypt(char *cipher_password, int len_cipher_password, char *key, char
 	return 1;
 }
 
+/**
+ * Get the Chromium base64 masterkey
+ *
+ * @return 1 on success, -1 on failure 
+ */
 int get_json_base64_key(char **b64_key) {
 	char *home = getenv("LOCALAPPDATA");
 	char local_state_path[MAX_PATH_SIZE];
@@ -159,17 +164,13 @@ int get_json_base64_key(char **b64_key) {
 	return 1;
 }
 
-size_t calcDecodeLength(const char* b64input) { //Calculates the length of a decoded string
-	size_t len = strlen(b64input),padding = 0;
 
-	if (b64input[len-1] == '=' && b64input[len-2] == '=') //last two chars are =
-		padding = 2;
-	else if (b64input[len-1] == '=') //last char is =
-		padding = 1;
 
-	return (len*3)/4 - padding;
-}
-
+/**
+ * Retrieve the base64 masterkey and DPAPI decrypt it
+ *
+ * @return 1 on success, -1 on failure 
+ */
 int get_base64_dpapi_key(char **key, int *key_len) {
 	// 1 - Get the base64 os_crypt.encrypted_key
 	char *base64_key;
@@ -179,7 +180,7 @@ int get_base64_dpapi_key(char **key, int *key_len) {
 	}
 
 	BIO *bio, *b64;
-	int decodeLen = calcDecodeLength(base64_key);
+	int decodeLen = calc_base64_length(base64_key);
 	*key = malloc(decodeLen+1);
 	if(*key == 0) {
 		fprintf(stderr, "malloc() failure\n");
@@ -203,6 +204,11 @@ int get_base64_dpapi_key(char **key, int *key_len) {
 	return 1;
 }
 
+/**
+ * Main function to decrypt any chrome encrypted data 
+ * 
+ * @return 1 on success, -1 on failure 
+ */
 int decrypt_chrome_cipher(char *cipher_password, int len_cipher_password, char **plaintext_password, char *masterkey) {
 	// TODO: find a better way to check for this
 	if(cipher_password[0] == 'v' && cipher_password[1] == '1') {
@@ -234,7 +240,11 @@ int decrypt_chrome_cipher(char *cipher_password, int len_cipher_password, char *
 	return 1;
 }
 
-// No Masterkey for windows
+/**
+ * Get the masterkey if it exists or not
+ *
+ * @return 1 on success, -1 on failure 
+ */
 int get_masterkey(char *login_data_path, char **masterkey) {
 	if(strstr(login_data_path, "Chromium")) {
 		char *dpapi_key;
@@ -255,13 +265,14 @@ int get_masterkey(char *login_data_path, char **masterkey) {
 		}
 		free(dpapi_key);
 	}
-	else {
-		// We allocate some random data
-		*masterkey = NULL;
-	}
 	return 1;
 }
 
+/**
+ * Load the Windows Chrome Paths
+ *
+ * @return 1 on success, -1 on failure 
+ */
 int load_chrome_paths(char *chrome_path, char *chrome_login_data_path, char *chromium_path, char *chromium_login_data_path) {
 	char *home = getenv("LOCALAPPDATA");
 	snprintf(chrome_path, MAX_PATH_SIZE, "%s\\Google\\Chrome\\User Data\\Default", home);

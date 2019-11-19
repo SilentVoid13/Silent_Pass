@@ -9,6 +9,7 @@
 #include "main.h"
 #include "firefox.h"
 #include "firefox_win.h"
+#include "functions.h"
 
 // We define some variables to hold our functions
 NSSInit NSS_Init;
@@ -21,6 +22,11 @@ NSSShutdown NSS_Shutdown;
 PK11FreeSlot PK11_FreeSlot;
 HMODULE moduleNSS;
 
+/** 
+ * Load Windows Required libraries
+ *
+ * @return 1 on success, -1 on failure
+ */
 int load_firefox_libs() {
         char pathFirefox[MAX_PATH_SIZE];
         char pathDll[MAX_PATH_SIZE];
@@ -64,11 +70,21 @@ int load_firefox_libs() {
         return 1;
 }
 
+/**
+ * Get the Firefox profile path
+ *
+ * @return 1 on success, -1 on failure
+ */
 int get_profile(char* profiles_ini_path, char* profile) {
 	GetPrivateProfileString("Profile0", "Path", "", profile, MAX_PATH_SIZE, profiles_ini_path);
 	return 1;
 }
 
+/** 
+ * Load Windows Firefox paths
+ *
+ * @return 1 on success, -1 on failure
+ */
 int load_firefox_paths(char *firefox_path, char *profiles_ini_path) {
 	SHGetSpecialFolderPath(0, firefox_path, CSIDL_APPDATA, FALSE); 
 	strcat(firefox_path, "\\Mozilla\\Firefox");
@@ -77,15 +93,18 @@ int load_firefox_paths(char *firefox_path, char *profiles_ini_path) {
 	return 1;
 }
 
+/**
+ * Decrypt firefox ciphered password
+ *
+ * @return 1 on success, -1 on failure
+ */
 int decrypt_firefox_cipher(char *ciphered, char **plaintext) {
-	// TODO: See if we have the '=' char
 	// TODO: See if we can use NSSBase64_DecodeBuffer()
 	// TODO: See if we can use SECItem_FreeItem() to free items after we finished
 	// TODO: See if we can use SECITEM_AllocItem()
-
 	SECItem request;
 	SECItem response;
-	unsigned int len = (strlen(ciphered) / 4) * 3;
+	unsigned int len = calc_base64_length(ciphered);
 
 	request.data = malloc(len+1);
 	request.len = len;
@@ -131,6 +150,11 @@ int decrypt_firefox_cipher(char *ciphered, char **plaintext) {
 	return 1;
 }
 
+/**
+ * Authenticate via NSS to be able to query passwords
+ *
+ * @return 1 on success, -1 on failure
+ */
 int nss_authenticate(char *profile_path, void *key_slot, const char *master_password) {
 	load_firefox_libs();
 	if(NSS_Init(profile_path) != SECSuccess) {
@@ -170,6 +194,11 @@ int nss_authenticate(char *profile_path, void *key_slot, const char *master_pass
 	return 1;
 }
 
+/**
+ * Free PK11 / NSS Functions
+ *
+ * @return 
+ */
 void free_pk11_nss(void *key_slot) {
 	PK11_FreeSlot(&key_slot);
 	NSS_Shutdown();

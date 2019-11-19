@@ -17,6 +17,11 @@
 const SecretSchema * get_chrome_like_schema (void) G_GNUC_CONST;
 #define CHROME_LIKE_SCHEMA  get_chrome_like_schema ()
 
+/**
+ * Get the chrome libsecret schema
+ *
+ * @return
+ */
 const SecretSchema *
 get_chrome_like_schema (void)
 {
@@ -125,6 +130,11 @@ int aes_decrypt(EVP_CIPHER_CTX *ctx, char *cipher_password, int len_cipher_passw
 	return 1;
 }
 
+/**
+ * Get the masterkey for the storage system in use
+ *
+ * @return 1 on success, -1 on failure
+ */
 int get_masterkey(char *login_data_path, char **masterkey) {
 	if(get_gnome_masterkey(login_data_path, masterkey) == -1) {
 		fprintf(stderr, "get_gnome_masterkey() failure\n");
@@ -134,6 +144,11 @@ int get_masterkey(char *login_data_path, char **masterkey) {
 	return 1;
 }
 
+/** 
+ * Decrypt the GNOME cipher password
+ *
+ * @return 1 on success, -1 on failure
+ */
 int decrypt_gnome_cipher(char *cipher_password, int len_cipher_password, char **plaintext_password, char *masterkey) {
 	// TODO: No need to recalculate the key every time. 
 	// 2 - We get the PBKDF2 key 
@@ -161,6 +176,11 @@ int decrypt_gnome_cipher(char *cipher_password, int len_cipher_password, char **
 	return 1;
 }
 
+/**
+ * Main function to decrypt chrome ciphered data
+ *
+ * @return 1 on success, -1 on failure
+ */
 int decrypt_chrome_cipher(char *cipher_password, int len_cipher_password, char **plaintext_password, char *masterkey) {
 	// TODO: check for GNOME / KWallet implementation
 	decrypt_gnome_cipher(cipher_password, len_cipher_password, plaintext_password, masterkey);
@@ -168,6 +188,11 @@ int decrypt_chrome_cipher(char *cipher_password, int len_cipher_password, char *
 	return 1;
 }
 
+/**
+ * Load linux chrome paths
+ *
+ * @return 1 on success, -1 on failure
+ */
 int load_chrome_paths(char *chrome_path, char *chrome_login_data_path, char *chromium_path, char *chromium_login_data_path) {
 	char *home = getenv("HOME");
 	snprintf(chrome_path, MAX_PATH_SIZE, "%s/.config/google-chrome/Default", home);

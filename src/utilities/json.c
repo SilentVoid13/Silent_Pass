@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include "json.h"
 
+/**
+ * Get a JSON file data
+ *
+ * @return 1 on success, -1 on failure 
+ */
 int parse_json(char *path, char **json) {
 	FILE *f = fopen(path, "rb"); 
 	if(f == NULL) {

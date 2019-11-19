@@ -21,6 +21,11 @@ VaultCloseVault_t VaultCloseVault = NULL;
 VaultFree_t VaultFree = NULL;
 HMODULE module_vault;
 
+/** 
+ * DPAPI decryption using an password
+ *
+ * @return 1 on success, -1 on failure
+ */
 int dpapi_decrypt_entropy(char *cipher_data, int len_cipher_data, wchar_t *entropy_password, int len_entropy_password, char **plaintext_data) {
 	DATA_BLOB encrypted_blob, decrypted_blob, entropy_blob;
 	encrypted_blob.cbData = len_cipher_data;
@@ -45,6 +50,11 @@ int dpapi_decrypt_entropy(char *cipher_data, int len_cipher_data, wchar_t *entro
 }
 
 
+/**
+ * Get the IE URLs registry from the "TypeURLs" entry
+ *
+ * @return 1 on success, -1 on failure
+ */
 int get_registry_history(IEUrl *urls, int *n_urls, int nHowMany) {
 	char szTemp[8];
 	HKEY hKey;
@@ -84,7 +94,11 @@ int get_registry_history(IEUrl *urls, int *n_urls, int nHowMany) {
 	return 1;
 }
 
-// TODO: improve this function
+/**
+ * Get the SHA1 hash value for a given url
+ *
+ * @return
+ */
 void get_url_hash(wchar_t *wstrURL, char *strHash, int dwSize) {
 	HCRYPTPROV hProv = 0;
 	HCRYPTHASH hHash = 0;
@@ -114,12 +128,22 @@ void get_url_hash(wchar_t *wstrURL, char *strHash, int dwSize) {
 	CryptReleaseContext(hProv, 0);
 }
 
+/**
+ * Get the IE history
+ *
+ * @return 1 on success, -1 on failure
+ */
 int get_ie_history() {
 	// TODO
 
 	return 1;
 }
 
+/**
+ * Add Some obvious websites to the list of websites
+ *
+ * @return
+ */
 void add_known_websites(IEUrl *urls, int *n_urls) {
 	// https://stackoverflow.com/questions/4832082/c-double-character-pointer-declaration-and-initialization
 	unsigned char *known_websites[] = {"https://www.facebook.com/", "http://www.facebook.com", "https://facebook.com/", "https://www.gmail.com/", "https://accounts.google.com/", "https://accounts.google.com/servicelogin"};
@@ -133,6 +157,11 @@ void add_known_websites(IEUrl *urls, int *n_urls) {
 	}
 }
 
+/**
+ * Main function to retrieve credentials from the registry
+ *
+ * @return 1 on success, -1 on failure
+ */
 int get_ie_registry_creds(const char *output_file) {
 	IEUrl urls[MAX_URL_HISTORY];
 	int n_urls = 0;
@@ -181,6 +210,11 @@ int get_ie_registry_creds(const char *output_file) {
 	return 1;
 }
 
+/** 
+ * Function to print the registry DPAPI decrypted data
+ *
+ * @return 1 on success, -1 on failure
+ */
 int print_decrypted_data(char *decrypted_data, char *url, const char *output_file) {
 	unsigned int HeaderSize;
 	unsigned int DataMax;
@@ -226,6 +260,11 @@ int print_decrypted_data(char *decrypted_data, char *url, const char *output_fil
 	return 1;
 }
 
+/** 
+ * Load the Windows IE necessary functions from the vaultcli
+ *
+ * @return 1 on success, -1 on failure
+ */
 int load_ie_vault_libs() {
 	module_vault = LoadLibrary("vaultcli.dll");
 	if(module_vault == NULL) {
@@ -249,6 +288,11 @@ int load_ie_vault_libs() {
 	return 1;
 }
 
+/** 
+ * Main function to retrieve vault IE credentials
+ *
+ * @return 1 on success, -1 on failure
+ */
 int get_ie_vault_creds(const char *output_file) {
 	if(load_ie_vault_libs() == -1) {
 		fprintf(stderr, "load_explorer_libs() failure\n");
@@ -319,6 +363,11 @@ int get_ie_vault_creds(const char *output_file) {
 	return 1;
 }
 
+/**
+ * IE functions wrapper that sets up everything we need
+ *
+ * @return 1 on success, -1 on failure 
+ */
 int dump_explorer(int verbose, const char *output_file) {
 	puts("[*] Starting IE10 / MSEdge dump...\n");
 	if(get_ie_vault_creds(output_file) == -1) {

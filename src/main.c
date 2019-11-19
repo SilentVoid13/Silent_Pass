@@ -12,16 +12,21 @@ struct arg_str *master;
 struct arg_file *output;
 struct arg_end *end;
 
+/** 
+ * Main function that parse the args and calls the different sub_functions
+ *
+ * @return 0
+ */
 int main(int argc, char** argv) {
 	void *argtable[] = {
-		help     = arg_litn("h", "help", 0, 1, "display this help and exit"),
-		version  = arg_litn("V", "version", 0, 1, "display version info and exit"),
-		verbose  = arg_litn("v", "verbose", 0, 1, "verbose output"),
+		help     = arg_litn("h", "help", 0, 1, "Display this help and exit"),
+		version  = arg_litn("V", "version", 0, 1, "Display version info and exit"),
+		verbose  = arg_litn("v", "verbose", 0, 1, "Verbose output"),
 		all      = arg_litn("a", "all", 0, 1, "Harvest all browsers credentials"),
 		firefox  = arg_litn("f", "firefox", 0, 1, "Harvest Firefox credentials"),
 		chrome   = arg_litn("c", "chrome", 0, 1, "Harvest Chrome-like credentials"),
-		specific = arg_litn("s", "specific", 0, 1, "Harvest OS Specific browsers credentials (No Specific OS browser for Linux for now)"),
-		master   = arg_strn("m", "master", "password", 0, 1, "Master password to decrypt passwords (Firefox only for now)"),
+		specific = arg_litn("s", "specific", 0, 1, "Harvest OS Specific browsers credentials"),
+		master   = arg_strn("m", "master", "password", 0, 1, "Master password to decrypt passwords (Firefox only)"),
 		output   = arg_filen("o", "output", "myfile", 0, 1, "Ouput file"),
 		end      = arg_end(20),	
 	};
@@ -54,6 +59,11 @@ int main(int argc, char** argv) {
 		arg_print_errors(stdout, end, progname);
 		printf("Try '%s --help' for more informations.\n", progname);
 		exit(1);
+	}
+
+	// We remove the file if it already exists to write to it (with append mode)
+	if(output->filename[0] != NULL) {
+		remove(output->filename[0]);
 	}
 
 	if(all->count > 0) {
