@@ -2,6 +2,7 @@
 docs
 RESOURCES.md
 silent*
+Silent_Pass*
 test*
 *.csv
 'System Volume Information'
