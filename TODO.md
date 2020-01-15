@@ -1,7 +1,7 @@
 # TODO List
 
 ## Globals 
-- [ ] Add Linux 32 bit support
+- [x] Add Linux 32 bit support
 - [ ] Add MAC OSX Support
 - [ ] Add FileZilla support
 - [ ] Add Opera support
@@ -32,6 +32,7 @@
 
 ## For Firefox
 - [ ] Choose the profile we want (or try for every profile)
+- [ ] Add better handling when firefox doesn't exists (Add message "Couldn't find" ...)
 - [x] Add Windows compatibility
 - [x] Split main function
 - [x] Enhance code

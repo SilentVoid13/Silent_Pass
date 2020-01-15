@@ -23,7 +23,7 @@ int get_profile(char* profiles_ini_path, char* profile) {
 	ini = iniparser_load(profiles_ini_path);
 
 	if(ini == NULL) {
-		fprintf(stderr, "Cannot parse file: %s", profiles_ini_path);
+		fprintf(stderr, "Cannot parse file: %s\n", profiles_ini_path);
 		return -1;
 	}
 	

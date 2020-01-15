@@ -117,7 +117,7 @@ int decrypt_firefox_cipher(char *ciphered, char **plaintext) {
 		free(decoded_cipher);
 		return -1;
 	}
-	memset(decoded_cipher, NULL, len+1);
+	memset(decoded_cipher, 0, len+1);
 
 	//response = SECITEM_AllocItem(NULL, NULL, 0);
 	//request = NSSBase64_DecodeBuffer(NULL, NULL, ciphered, len);

@@ -103,7 +103,7 @@ int dump_firefox(int verbose, const char *output_file, const char *master_passwo
 	load_firefox_paths(firefox_path, profiles_ini_path);
 
 	if(get_profile(profiles_ini_path, profile) == -1) {
-		fprintf(stderr, "get_profile() failure");
+		fprintf(stderr, "get_profile() failure\n");
 		return -1;
 	}
 

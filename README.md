@@ -2,7 +2,7 @@
 
 Silent_Pass is a cross platform browser credential harvester written in pure C.
 
-It currently supports Linux and Windows OS.
+It currently supports Linux and Windows OS. It's a 32 bit program, so it should work on most of the machines even older ones.
 
 I wrote this program mainly for entertainment and to learn more. My code is surely not perfect, do not hesitate to contact me for any problems / code enhancement suggestion at silentvoid13@protonmail.com.
 
@@ -36,40 +36,41 @@ Usage: Silent_Pass [-hVvafcs] [-m password] [-o myfile]
 
 Master Password can only be used with Firefox (other browsers don't implement it).
 
-Output file format is in CSV.
+Output file format is in [CSV](https://en.wikipedia.org/wiki/Comma-separated_values).
 
 ## Building
 
-You can either get the compiled version from the latest release, from the bin directory, or compile it yourself.
+You can either get the compiled version from the latest [release](https://github.com/SilentVoid13/Silent_Pass/releases), from the [bin](https://github.com/SilentVoid13/Silent_Pass/tree/master/bin) directory, or compile it yourself.
 
 You can build the Windows binary using mingw (i686-w64-mingw32-gcc). No 32 bit version for Linux is currently available.
 
 Compiling time can be quite long because of the various dependencies (~1 min)
 
-For Linux :
+For Linux, you will need `gcc` :
 
 ```bash
-make
+make linux
 ```
 
-For Windows :
+For Windows you will need `mingw` and more precisely `i686-w64-mingw32-gcc` :
 
 ```bash
 make win
 ```
 
-Compiled binaries will be available in the bin directory.
+Compiled binaries will be available in the [bin](https://github.com/SilentVoid13/Silent_Pass/tree/master/bin) directory.
 
 ## Dependencies
 
 Currently, Silent_Pass relies on the following dependencies :
 
-- OpenSSL
+- libopenssl
 - libsecret
 - NSS
-
-- cJSON
+- cJSON 
 - argtable3
+- gnome-keyring
+- iniparser
 
 ## Known bugs
 
