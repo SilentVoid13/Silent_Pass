@@ -1,10 +1,10 @@
 # Silent_Pass
 
-Silent_Pass is a cross platform browser credential harvester written in pure C.
+Silent_Pass is a cross-platform browser credential harvester written in pure C.
 
-It currently supports Linux and Windows OS. It's a 32 bit program, so it should work on most of the machines even older ones.
+It currently supports Linux and Windows OS. It's a 32 bit program, so it should work on most of the machines, even older ones.
 
-I wrote this program mainly for entertainment and to learn more. My code is surely not perfect, do not hesitate to contact me for any problems / code enhancement suggestion at silentvoid13@protonmail.com.
+I wrote this program mainly for entertainment and to learn more. My code is surely not perfect, do not hesitate to make pull requests or to contact me for any problems / code enhancement suggestion at silentvoid13@protonmail.com.
 
 ## License
 
@@ -34,7 +34,7 @@ Usage: Silent_Pass [-hVvafcs] [-m password] [-o myfile]
   -o, --output=myfile       Ouput file
 ```
 
-Master Password can only be used with Firefox (other browsers don't implement it).
+Master Password option can only be used with Firefox (other browsers don't implement it).
 
 Output file format is in [CSV](https://en.wikipedia.org/wiki/Comma-separated_values).
 
@@ -42,7 +42,7 @@ Output file format is in [CSV](https://en.wikipedia.org/wiki/Comma-separated_val
 
 You can either get the compiled version from the latest [release](https://github.com/SilentVoid13/Silent_Pass/releases), from the [bin](https://github.com/SilentVoid13/Silent_Pass/tree/master/bin) directory, or compile it yourself.
 
-You can build the Windows binary using mingw (i686-w64-mingw32-gcc). No 32 bit version for Linux is currently available.
+You can build the Windows binary using `mingw` (`i686-w64-mingw32-gcc`).
 
 Compiling time can be quite long because of the various dependencies (~1 min)
 
@@ -52,7 +52,7 @@ For Linux, you will need `gcc` :
 make linux
 ```
 
-For Windows you will need `mingw` and more precisely `i686-w64-mingw32-gcc` :
+For Windows you will need `mingw` and more precisely `i686-w64-mingw32-gcc` (32 bits version) :
 
 ```bash
 make win
