@@ -44,7 +44,11 @@ You can either get the compiled version from the latest [release](https://github
 
 You can build the Windows binary using `mingw` (`i686-w64-mingw32-gcc`).
 
-Compiling time can be quite long because of the various dependencies (~1 min)
+In order to build it, you will need to get the 32 bits version of each of the dependencies listed below.
+
+You might experience some trouble when compiling with an old version of `gcc` or `mingw` (Tested and working with version >= 8.3)  
+
+Compiling time can be quite long because of the various dependencies (~1 min).
 
 For Linux, you will need `gcc` :
 
@@ -66,11 +70,13 @@ Currently, Silent_Pass relies on the following dependencies :
 
 - libopenssl
 - libsecret
-- NSS
-- cJSON 
-- argtable3
+- libnss3
 - gnome-keyring
+- pkg-config
 - iniparser
+- argtable3
+- sqlite3
+- cJSON
 
 ## Known bugs
 
