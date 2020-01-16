@@ -32,7 +32,7 @@
 
 ## For Firefox
 - [ ] Choose the profile we want (or try for every profile)
-- [ ] Add better handling when firefox doesn't exists (Add message "Couldn't find" ...)
+- [x] Add better handling when firefox doesn't exists (Add message "Couldn't find" ...)
 - [x] Add Windows compatibility
 - [x] Split main function
 - [x] Enhance code

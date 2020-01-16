@@ -5,4 +5,4 @@ silent*
 test*
 *.csv
 'System Volume Information'
-REQUIREMENTS.md
+DEPENDENCIES.md

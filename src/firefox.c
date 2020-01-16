@@ -104,6 +104,7 @@ int dump_firefox(int verbose, const char *output_file, const char *master_passwo
 
 	if(get_profile(profiles_ini_path, profile) == -1) {
 		fprintf(stderr, "get_profile() failure\n");
+		fprintf(stderr, "[-] Couldn't find any Firefox installation (No profile found)\n");
 		return -1;
 	}
 
@@ -121,7 +122,7 @@ int dump_firefox(int verbose, const char *output_file, const char *master_passwo
 		return -1;
 	}
 	else if(result == 0) {
-		fprintf(stderr, "[-] Couldn't find any Firefox installation\n");
+		fprintf(stderr, "[-] Couldn't find any Firefox installation (No logins.json file found)\n");
 		return -1;
 	}
 	return 1;

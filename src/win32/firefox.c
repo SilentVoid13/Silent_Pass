@@ -77,7 +77,13 @@ int load_firefox_libs() {
  */
 int get_profile(char* profiles_ini_path, char* profile) {
 	GetPrivateProfileString("Profile0", "Path", "", profile, MAX_PATH_SIZE, profiles_ini_path);
-	return 1;
+
+	if(GetLastError() == 2) {
+		return -1;
+	}
+	else {
+		return 1;
+	}
 }
 
 /** 
