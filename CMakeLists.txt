@@ -1,13 +1,17 @@
+### Basic cmake setup ###
+
 cmake_minimum_required(VERSION 3.2.1)
 
 project(Silent_Pass)
-
-include_directories(includes includes/nss)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/staticlibs)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/staticlibs)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+
+### Includes ### 
+
+include_directories(includes includes/nss includes/nspr)
 
 
 ### Sources ###
@@ -23,22 +27,22 @@ if(UNIX)
 endif(UNIX)
 
 add_executable(Silent_Pass ${SOURCES})
+install(TARGETS Silent_Pass DESTINATION bin)
 
 
-
-### Static libs ###
+### Static common libs ###
 
 set(ARGTABLE_SOURCES "lib/src/argtable3.c")
 add_library(argtable3 STATIC ${ARGTABLE_SOURCES})
-install(TARGETS argtable3 DESTINATION staticlibs)
+#install(TARGETS argtable3 DESTINATION staticlibs)
 
 set(CJSON_SOURCES "lib/src/cJSON.c")
 add_library(cjson STATIC ${CJSON_SOURCES})
-install(TARGETS cjson DESTINATION staticlibs)
+#install(TARGETS cjson DESTINATION staticlibs)
 
 set(SQLITE3_SOURCES "lib/src/sqlite3.c")
 add_library(sqlite3 STATIC ${SQLITE3_SOURCES})
-install(TARGETS sqlite3 DESTINATION staticlibs)
+#install(TARGETS sqlite3 DESTINATION staticlibs)
 
 target_link_libraries(Silent_Pass cjson sqlite3 argtable3)
 

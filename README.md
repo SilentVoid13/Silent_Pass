@@ -2,7 +2,7 @@
 
 Silent_Pass is a cross-platform browser credential harvester written in pure C.
 
-It currently supports Linux and Windows OS. It's a 32 bit program, so it should work on most of the machines, even older ones.
+It currently supports Linux and Windows OS. 32 bit version is available, so it should work on most of the machines, even older ones.
 
 I wrote this program mainly for entertainment and to learn more. My code is surely not perfect, do not hesitate to make pull requests or to contact me for any problems / code enhancement suggestion at silentvoid13@protonmail.com.
 
@@ -42,24 +42,43 @@ Output file format is in [CSV](https://en.wikipedia.org/wiki/Comma-separated_val
 
 You can either get the compiled version from the latest [release](https://github.com/SilentVoid13/Silent_Pass/releases), from the [bin](https://github.com/SilentVoid13/Silent_Pass/tree/master/bin) directory, or compile it yourself.
 
-You can build the Windows binary using `mingw` (`i686-w64-mingw32-gcc`).
+To build it yourself you will need `cmake`.
 
-In order to build it, you will need to get the 32 bits version of each of the dependencies listed below.
+You can build the Windows binary using `mingw`.
 
-You might experience some trouble when compiling with an old version of `gcc` or `mingw` (Tested and working with version >= 8.3)  
+You might experience some trouble when compiling with an old version of `gcc` or `mingw` (Tested and working with version >= 8.3)
 
 Compiling time can be quite long because of the various dependencies (~1 min).
 
-For Linux, you will need `gcc` :
+#### On Linux
+
+For Linux compiling, you will need `gcc` :
 
 ```bash
-make linux
+mkdir build && cd build
+cmake ..
+make
+make install
 ```
 
-For Windows you will need `mingw` and more precisely `i686-w64-mingw32-gcc` (32 bits version) :
+For Windows cross-compiling, you will need `mingw` and more precisely `i686-w64-mingw32-gcc` (32 bits version) :
 
 ```bash
-make win
+mkdir build && cd build
+cmake -DCMAKE_TOOLCHAIN_FILE=platforms/linux/mingw32.toolchain.cmake ..
+make
+make install
+```
+
+#### On Windows
+
+For Windows compiling you will need [`mingw`](https://sourceforge.net/projects/mingw-w64/) 
+
+```bash
+make win & cd build
+cmake -G "MinGW Makefiles" ..
+mingw32-make
+mingw32-install
 ```
 
 Compiled binaries will be available in the [bin](https://github.com/SilentVoid13/Silent_Pass/tree/master/bin) directory.
