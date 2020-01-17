@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2.1)
 
 project(Silent_Pass)
 
-include_directories(includes)
+include_directories(includes includes/nss)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/staticlibs)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/staticlibs)
@@ -47,9 +47,9 @@ target_link_libraries(Silent_Pass cjson sqlite3 argtable3)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-find_package(NSS REQUIRED) 
-include_directories(Silent_Pass ${NSS_INCLUDE_DIRS})
-message(STATUS "${NSS_INCLUDE_DIRS}")
+#find_package(NSS REQUIRED) 
+#include_directories(Silent_Pass ${NSS_INCLUDE_DIRS})
+#message(STATUS "${NSS_INCLUDE_DIRS}")
 
 ### Linux libs ###
 if(UNIX)
@@ -59,11 +59,12 @@ if(UNIX)
 
 	find_package(OpenSSL REQUIRED)
 	find_package(Libsecret REQUIRED)
+	find_package(NSS REQUIRED) 
 
 	#find_library(NSS_LIB NAMES nss nss3)
 	#find_library(SECRET_LIB NAMES secret secret-1)
 
-	include_directories(${OPENSSL_INCLUDE_DIRS} ${LIBSECRET_INCLUDE_DIRS})
+	include_directories(${OPENSSL_INCLUDE_DIRS} ${LIBSECRET_INCLUDE_DIRS} ${NSS_INCLUDE_DIRS})
 	target_link_libraries(Silent_Pass ${OPENSSL_LIBRARIES} ${NSS_LIBRARIES} ${LIBSECRET_LIBRARIES} iniparser dl m pthread)
 endif(UNIX)
 
