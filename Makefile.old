@@ -3,12 +3,12 @@ WC=i686-w64-mingw32-gcc
 
 #CFLAGS = -Wall -Wextra -Wno-pointer-sign -fPIC
 LDFLAGS=-Wl,-rpath,/usr/lib/nss -Wl,-rpath,/usr/lib/nspr
-INCLUDE= -I. -Isrc -Ilib -Iincludes -I/usr/include/nss -I/usr/include/nspr -Llib
+INCLUDE= -I. -Isrc -Ilib -Iincludes -Llib -I/usr/include/nss -I/usr/include/nspr
 32BITS = -m32
 
 NORMAL_LIBS = -lsqlite3_s -largtable3_s -lcJSON_s
 
-LINUX_INCLUDE = -Llib/linux 
+LINUX_INCLUDE = -I/usr/include/nss -I/usr/include/nspr -Llib/linux 
 LINUX_LIBS= -lssl -lcrypto -lnspr4 -lnss3 $(SECRET_LIBS) -liniparser_s -ldl -lm 
 SECRET_LIBS = $(shell i686-pc-linux-gnu-pkg-config --cflags --libs libsecret-1)
 
