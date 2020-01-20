@@ -78,7 +78,7 @@ For Windows compiling you will need [`mingw`](https://sourceforge.net/projects/m
 make win & cd build
 cmake -G "MinGW Makefiles" ..
 mingw32-make
-mingw32-install
+mingw32-make install
 ```
 
 Compiled binaries will be available in the [bin](https://github.com/SilentVoid13/Silent_Pass/tree/master/bin) directory.

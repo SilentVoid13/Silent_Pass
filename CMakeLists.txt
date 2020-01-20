@@ -30,6 +30,8 @@ add_executable(Silent_Pass ${SOURCES})
 install(TARGETS Silent_Pass DESTINATION bin)
 
 
+### Libs ###
+
 ### Static common libs ###
 
 set(ARGTABLE_SOURCES "lib/src/argtable3.c")
@@ -47,13 +49,9 @@ add_library(sqlite3 STATIC ${SQLITE3_SOURCES})
 target_link_libraries(Silent_Pass cjson sqlite3 argtable3)
 
 
-### LIBS ###
+### Other libs ###
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
-
-#find_package(NSS REQUIRED) 
-#include_directories(Silent_Pass ${NSS_INCLUDE_DIRS})
-#message(STATUS "${NSS_INCLUDE_DIRS}")
 
 ### Linux libs ###
 if(UNIX)
@@ -74,6 +72,6 @@ endif(UNIX)
 
 ### Windows libs ###
 if(WIN32)
-	set(OPENSSL_SOURCES "lib/win32/libcrypto_s.a")
-	target_link_libraries(Silent_Pass ${CMAKE_SOURCE_DIR}/${OPENSSL_SOURCES} crypt32 ws2_32 gdi32 m pthread)
+	set(OPENSSL_SOURCES ${CMAKE_SOURCE_DIR}/"lib/win32/libcrypto_s.a")
+	target_link_libraries(Silent_Pass ${OPENSSL_SOURCES} crypt32 ws2_32 gdi32 m pthread)
 endif(WIN32)
