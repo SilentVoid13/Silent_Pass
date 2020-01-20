@@ -42,9 +42,9 @@ Output file format is in [CSV](https://en.wikipedia.org/wiki/Comma-separated_val
 
 You can either get the compiled version from the latest [release](https://github.com/SilentVoid13/Silent_Pass/releases), from the [bin](https://github.com/SilentVoid13/Silent_Pass/tree/master/bin) directory, or compile it yourself.
 
-To build it yourself you will need `cmake`.
+To build it yourself you will need `cmake`
 
-You can build the Windows binary using `mingw`.
+You can build the Windows binary from Windows using `mingw`. You can also cross-compile it from Linux.
 
 You might experience some trouble when compiling with an old version of `gcc` or `mingw` (Tested and working with version >= 8.3)
 
@@ -52,7 +52,7 @@ Compiling time can be quite long because of the various dependencies (~1 min).
 
 #### On Linux
 
-For Linux compiling, you will need `gcc` :
+For Linux compiling, you will need `gcc / g++` :
 
 ```bash
 mkdir build && cd build
@@ -61,7 +61,7 @@ make
 make install
 ```
 
-For Windows cross-compiling, you will need `mingw` and more precisely `i686-w64-mingw32-gcc` (32 bits version) :
+To cross-compile for Windows, you will need `mingw` and more precisely `i686-w64-mingw32-gcc / i686-w64-mingw32-g++` (32 bits version) :
 
 ```bash
 mkdir build && cd build
