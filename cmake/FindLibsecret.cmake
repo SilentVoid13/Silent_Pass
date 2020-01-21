@@ -1,9 +1,9 @@
 # - Try to find libsecret
 # Once done, this will define
 #
-# LIBSECRET_FOUND - system has libsecret
-# LIBSECRET_INCLUDE_DIRS - the libsecret include directories
-# LIBSECRET_LIBRARIES - link these to use libsecret
+#  LIBSECRET_FOUND - system has libsecret
+#  LIBSECRET_INCLUDE_DIRS - the libsecret include directories
+#  LIBSECRET_LIBRARIES - link these to use libsecret
 #
 # Copyright (C) 2012 Raphael Kubo da Costa <rakuco@webkit.org>
 # Copyright (C) 2014 Igalia S.L.
@@ -11,11 +11,11 @@
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
-# 1. Redistributions of source code must retain the above copyright
-# notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the above copyright
-# notice, this list of conditions and the following disclaimer in the
-# documentation and/or other materials provided with the distribution.
+# 1.  Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+# 2.  Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution.
 #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER AND ITS CONTRIBUTORS ``AS
 # IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -29,15 +29,8 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-include(LibFindMacros)
-libfind_pkg_check_modules(LIBSECRET libsecret-1)
-foreach(i ${LIBSECRET_LIBRARIES})
-	find_library(_libsecret_LIBRARY NAMES ${i} HINTS ${LIBSECRET_LIBRARY_DIRS})
-	LIST(APPEND LIBSECRET_LIBRARY ${_libsecret_LIBRARY})
-	unset(_libsecret_LIBRARY CACHE)
-endforeach(i)
-set(LIBSECRET_LIBRARIES ${LIBSECRET_LIBRARY})
-unset(LIBSECRET_LIBRARY CACHE)
+find_package(PkgConfig)
+pkg_check_modules(LIBSECRET libsecret-1)
 
 set(VERSION_OK TRUE)
 if (LIBSECRET_VERSION)

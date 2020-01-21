@@ -72,6 +72,7 @@ endif(UNIX)
 
 ### Windows libs ###
 if(WIN32)
-	set(OPENSSL_SOURCES ${CMAKE_SOURCE_DIR}/"lib/win32/libcrypto_s.a")
+	set(OPENSSL_SOURCES ${CMAKE_SOURCE_DIR}/lib/win32/libcrypto_s.a)
+	message("OPENSSL_SOURCES ${OPENSSL_SOURCES}")
 	target_link_libraries(Silent_Pass ${OPENSSL_SOURCES} crypt32 ws2_32 gdi32 m pthread)
 endif(WIN32)
