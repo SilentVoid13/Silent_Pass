@@ -1,9 +1,20 @@
 *.o
+*.csv
+*.sh
+
 docs
-RESOURCES.md
 silent*
 test*
-*.csv
 'System Volume Information'
+
+RESOURCES.md
 DEPENDENCIES.md
+
+# Cmake related files
+Makefile.old
+Makefile
+staticlibs
 cmake_tests
+cmake_install.cmake
+CMakeFiles
+CMakeCache.txt

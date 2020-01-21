@@ -61,7 +61,7 @@ make
 make install
 ```
 
-To cross-compile for Windows, you will need `mingw` and more precisely `i686-w64-mingw32-gcc / i686-w64-mingw32-g++` (32 bits version) :
+To cross-compile for Windows, you will need `mingw` and more precisely `i686-w64-mingw32-gcc / i686-w64-mingw32-g++` (32 bit version) :
 
 ```bash
 mkdir build && cd build
@@ -70,9 +70,18 @@ make
 make install
 ```
 
+To compile the 32 bit Linux version from a 64 bit Linux machine (you will need to download all the dependencies 32 bit version) :
+
+```bash
+mkdir build && cd build
+cmake -DCMAKE_TOOLCHAIN_FILE=platforms/linux/linux_i686.toolchain.cmake ..
+make
+make install
+```
+
 #### On Windows
 
-For Windows compiling you will need [`mingw`](https://sourceforge.net/projects/mingw-w64/) 
+For Windows compiling you will need [`mingw`](https://sourceforge.net/projects/mingw-w64/)  :
 
 ```bash
 make win & cd build
@@ -81,7 +90,7 @@ mingw32-make
 mingw32-make install
 ```
 
-Compiled binaries will be available in the [bin](https://github.com/SilentVoid13/Silent_Pass/tree/master/bin) directory.
+Compiled binaries will be available in the **bin** directory.
 
 ## Dependencies
 
