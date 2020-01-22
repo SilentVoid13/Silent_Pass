@@ -2,6 +2,7 @@
 *.csv
 *.sh
 !compile_all.sh
+!clean.sh
 
 docs
 silent*
