@@ -1,7 +1,12 @@
-#include "sqlite3.h"
-
 #ifndef CHROME_H
 #define CHROME_H
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#include "sqlite3.h"
 
 #define KEY_LENGTH 16
 #define SECRET_QUERY_SIZE 30

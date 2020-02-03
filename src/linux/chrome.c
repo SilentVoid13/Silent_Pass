@@ -1,17 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <libsecret/secret.h>
-
-#include <openssl/conf.h>
-#include <openssl/evp.h>
-#include <openssl/err.h>
-
-#include "sqlite3.h"
-#include "main.h"
 #include "chrome.h"
 #include "chrome_linux.h"
+#include "main.h"
+
 #include "functions.h"
 
 const SecretSchema * get_chrome_like_schema (void) G_GNUC_CONST;

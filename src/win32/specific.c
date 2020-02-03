@@ -1,12 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <windows.h>
-#include <wincrypt.h>
-#include <shlobj.h>
-#include <prtypes.h> 
-
+#include "specific_win.h"
+#include "specific.h"
 #include "main.h"
+
 #include "explorer.h"
 
 /**

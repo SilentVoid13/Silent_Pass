@@ -1,16 +1,6 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
-#include "nss.h"
-#include "nssb64.h"
-#include "pk11pub.h"
-#include "pk11sdr.h"
-#include "iniparser.h"
-
-#include "main.h"
-#include "firefox.h"
 #include "firefox_linux.h"
+#include "firefox.h"
+#include "main.h"
 
 /**
  * Get the Linux Firefox profile

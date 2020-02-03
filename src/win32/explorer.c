@@ -1,17 +1,10 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <wchar.h>
-
-#include <windows.h>
-#include <wincrypt.h>
-#include <shlobj.h>
-#include <prtypes.h> 
-
-#include <urlhist.h>
-
-#include "main.h"
 #include "explorer.h"
+#include "specific_win.h"
+#include "specific.h"
+#include "main.h"
+
 #include "functions.h"
+
 
 VaultEnumerateVaults_t VaultEnumerateVaults = NULL;
 VaultOpenVault_t VaultOpenVault = NULL;

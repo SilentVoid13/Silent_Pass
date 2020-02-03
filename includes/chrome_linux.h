@@ -1,6 +1,12 @@
 #ifndef CHROME_LINUX_H
 #define CHROME_LINUX_H
 
+#include <libsecret/secret.h>
+
+#include <openssl/conf.h>
+#include <openssl/evp.h>
+#include <openssl/err.h>
+
 const SecretSchema *get_chrome_like_schema(void);
 int get_gnome_masterkey(char *login_data_path, char **masterkey); 
 int aes_decrypt(EVP_CIPHER_CTX *ctx, char *cipher_password, int len_cipher_password, char **plaintext_password, char *iv, unsigned char *output_key);

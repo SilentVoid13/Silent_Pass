@@ -1,11 +1,6 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-
-#include "cJSON.h"
-#include "main.h"
 #include "firefox.h"
+#include "main.h"
+
 #include "json.h"
 
 /**

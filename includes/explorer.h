@@ -1,10 +1,13 @@
+#ifndef EXPLORER_H
+#define EXPLORER_H
+
 #include <windows.h>
 #include <wincrypt.h>
 #include <shlobj.h>
 #include <prtypes.h> 
+#include <wchar.h>
 
-#ifndef EXPLORER_H
-#define EXPLORER_H
+#include <urlhist.h>
 
 #define URL_MAX_SIZE 150
 #define MAX_HASH_SIZE 1024

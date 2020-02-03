@@ -1,14 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "argtable3.h"
 #include "main.h"
 #include "firefox.h"
 #include "chrome.h"
 
-
-struct arg_lit *verbose, *help, *version, *all, *firefox, *chrome, *specific;
-struct arg_str *master;
+struct arg_lit *verbose, *help, *version, *all, *firefox, *chrome, *specific, *filezilla;
+struct arg_str *master_firefox, *master_filezilla;
 struct arg_file *output;
 struct arg_end *end;
 
@@ -26,18 +21,21 @@ int main(int argc, char** argv) {
 		firefox  = arg_litn("f", "firefox", 0, 1, "Harvest Firefox credentials"),
 		chrome   = arg_litn("c", "chrome", 0, 1, "Harvest Chrome-like credentials"),
 		specific = arg_litn("s", "specific", 0, 1, "Harvest OS Specific browsers credentials"),
-		master   = arg_strn("m", "master", "password", 0, 1, "Master password to decrypt passwords (Firefox only)"),
-		output   = arg_filen("o", "output", "myfile", 0, 1, "Ouput file"),
+		filezilla = arg_litn("F", "filezilla", 0, 1, "Harvest FileZilla credentials"),
+		master_firefox   = arg_strn(NULL, "master-firefox", "password", 0, 1, "Master password to decrypt passwords for Firefox"),
+		master_filezilla = arg_strn(NULL, "master-filezilla", "password", 0, 1, "Master password to decrypt passwords for FileZilla"),
+		output   = arg_filen("o", "output", "filename", 0, 1, "Output file"),
 		end      = arg_end(20),	
 	};
 
 	char *progname = "Silent_Pass";
 	char *progversion = "0.1";
-	char *progdate = "2019";
+	char *progdate = "2020";
 	char *author_name = "SilentVoid";
 
 	output->filename[0] = NULL;
-	master->sval[0] = NULL;
+	master_firefox->sval[0] = NULL;
+	master_filezilla->sval[0] = NULL;
 	
 	int nerrors;
 	nerrors = arg_parse(argc, argv, argtable);
@@ -68,7 +66,7 @@ int main(int argc, char** argv) {
 
 	if(all->count > 0) {
 		puts("[*] All mode");
-		if(dump_firefox(verbose->count, output->filename[0], master->sval[0]) == -1) {
+		if(dump_firefox(verbose->count, output->filename[0], master_firefox->sval[0]) == -1) {
 			fprintf(stderr, "dump_firefox() failure\n");
 		}
 		if(dump_chrome(verbose->count, output->filename[0]) == -1) {
@@ -76,6 +74,9 @@ int main(int argc, char** argv) {
 		}
 		if(dump_specific(verbose->count, output->filename[0]) == -1) {
 			fprintf(stderr, "dump_specific() failure\n");
+		}
+		if(dump_filezilla(verbose->count, output->filename[0], master_filezilla->sval[0]) == -1) {
+			fprintf(stderr, "dump_filezilla() failure\n");
 		}
 	}
 	else if (chrome->count > 0) {
@@ -87,7 +88,7 @@ int main(int argc, char** argv) {
 	}
 	else if (firefox->count > 0) {
 		puts("[*] Firefox mode");
-		if(dump_firefox(verbose->count, output->filename[0], master->sval[0]) == -1) {
+		if(dump_firefox(verbose->count, output->filename[0], master_firefox->sval[0]) == -1) {
 			fprintf(stderr, "dump_firefox() failure\n");
 		}
 	}
@@ -95,6 +96,12 @@ int main(int argc, char** argv) {
 		puts("[*] Specific mode");
 		if(dump_specific(verbose->count, output->filename[0]) == -1) {
 			fprintf(stderr, "dump_specific() failure\n");
+		}
+	}
+	else if (filezilla->count > 0) {
+		puts("[*] FileZilla mode");
+		if(dump_filezilla(verbose->count, output->filename[0], master_filezilla->sval[0]) == -1) {
+			fprintf(stderr, "dump_filezilla() failure\n");
 		}
 	}
 	else {

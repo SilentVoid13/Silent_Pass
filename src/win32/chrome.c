@@ -1,25 +1,10 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include "sqlite3.h"
-#include "main.h"
-#include "chrome.h"
 #include "chrome_win.h"
-#include "functions.h"
+#include "chrome.h"
+#include "main.h"
+
 #include "json.h"
-#include "cJSON.h"
-
-#include <winsock2.h>
-#include <windows.h>
-#include <wincrypt.h>
-#include <shlobj.h>
-
-#include <openssl/conf.h>
-#include <openssl/evp.h>
-#include <openssl/err.h>
-#include <openssl/kdf.h>
-#include <openssl/bio.h>
+#include "base64.h"
+#include "functions.h"
 
 /**
  * DPAPI decrypt with any password (user password)
@@ -112,7 +97,6 @@ int aead_decrypt(char *cipher_password, int len_cipher_password, char *key, char
 	if(1!=EVP_DecryptFinal_ex(ctx, *plaintext_password+len, &len)) {
 		fprintf(stderr, "EVP_DecryptFinal_ex() failure\n");
 		ERR_print_errors_fp(stderr);
-		ERR_print_errors_fp(stdout);
 	}
 
 	plaintext_len += len;

@@ -1,6 +1,11 @@
 #ifndef FIREFOX_WIN_H
 #define FIREFOX_WIN_H
 
+#include <windows.h>
+#include <wincrypt.h>
+#include <shlobj.h>
+#include <prtypes.h> 
+
 typedef enum {
     siBuffer,
     siClearDataBuffer,

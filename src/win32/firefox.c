@@ -1,14 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-
-#include <windows.h>
-#include <wincrypt.h>
-#include <shlobj.h>
-#include <prtypes.h> 
-
-#include "main.h"
-#include "firefox.h"
 #include "firefox_win.h"
+#include "firefox.h"
+#include "main.h"
+
 #include "functions.h"
 
 // We define some variables to hold our functions

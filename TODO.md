@@ -17,12 +17,16 @@
 - [x] Add all functions to header files
 
 ## For Chrome
+
 ### Global
 - [ ] Better alternative to malloc / strncpy (maybe memcpy / memset)
 - [x] Handle cipher text length problem
+
 ### Linux
 - [ ] Implement plain text / KWallet support
+
 ### Windows
+- [ ] Fix get_base64_dpapi_key() to use base64.c 
 - [ ] Fix cJSON segfault problem (or change JSON lib)
 - [ ] Find a better way to check for the version prefix
 - [x] Split decrypt_chrome_cipher() 
@@ -46,3 +50,8 @@
 - [ ] Add IE6- Support ?
 - [x] Add IE7-IE9 Support
 - [x] Test Vault for Windows 7
+
+## For FileZilla
+- [ ] Add master password support
+- [ ] Add MinGW libxml support (for Windows)
+- [ ] Clean code / Add errors checks

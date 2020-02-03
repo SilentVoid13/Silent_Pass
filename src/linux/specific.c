@@ -1,6 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-
+#include "specific_linux.h"
+#include "specific.h"
 #include "main.h"
 
 /**
@@ -10,7 +9,7 @@
  */
 int dump_specific(int verbose, const char *output_file) {
 	puts("[*] Starting OS Specific dump...");
-	puts("[-] Linux does not have any OS Specific browsers");
+	puts("[-] Currently no OS Specific browsers implemented for Linux");
 
 	return 1;
 }
