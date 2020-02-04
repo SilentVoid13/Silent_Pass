@@ -5,21 +5,12 @@
 #include "base64.h"
 #include "functions.h"
 
-int parse_sitemanager_xml() {
-	char *path = "/home/silentvoid/.config/filezilla/sitemanager.xml";
-	
+int parse_sitemanager_xml(int verbose, const char *output_file, const char *master_password, char *path) {
 	xmlDocPtr doc;
 	xmlNodePtr cur;
 
-	doc = xmlParseFile(path);
-	if(doc == NULL) {
-		fprintf(stderr, "xmlReaderForFile() failure\n");
-		return -1;
-	}
-
-	cur = xmlDocGetRootElement(doc);
-	if(cur == NULL) {
-		fprintf(stderr, "xmlDocGetRootElement() failure\n");
+	if(init_xml_file(&doc, &cur, path) == -1) {
+		fprintf(stderr, "init_xml_file() failure\n");
 		return -1;
 	}
 
@@ -41,21 +32,12 @@ int parse_sitemanager_xml() {
 	return 1;
 }
 
-int parse_recentserver_xml() {
-	char *path = "/home/silentvoid/.config/filezilla/recentservers.xml";
-	
+int parse_recentservers_xml(int verbose, const char *output_file, const char *master_password, char *path) {
 	xmlDocPtr doc;
 	xmlNodePtr cur;
 
-	doc = xmlParseFile(path);
-	if(doc == NULL) {
-		fprintf(stderr, "xmlReaderForFile() failure\n");
-		return -1;
-	}
-
-	cur = xmlDocGetRootElement(doc);
-	if(cur == NULL) {
-		fprintf(stderr, "xmlDocGetRootElement() failure\n");
+	if(init_xml_file(&doc, &cur, path) == -1) {
+		fprintf(stderr, "init_xml_file() failure\n");
 		return -1;
 	}
 
@@ -75,41 +57,6 @@ int parse_recentserver_xml() {
 	xmlCleanupParser();
 
 	return 1;
-}
-
-xmlNodePtr retrieve_xml_node(xmlNodePtr cur, char *node_name) {
-	int valid = 0;
-	while(cur != NULL) {
-		if(xmlStrcmp(cur->name, (const xmlChar *) node_name) == 0) {
-			valid = 1;
-			break;
-		}
-		cur = cur->next;
-	}
-
-	if(valid)
-		return cur;
-	else
-		return NULL;
-}
-
-xmlNodePtr retrieve_xml_attribute(xmlNodePtr cur, char *attribute_name, char *attribute_value) {
-	xmlChar *attribute;
-	int valid = 0;
-	while(cur != NULL) {
-		attribute = xmlGetProp(cur, attribute_name);
-		if(attribute != NULL && strcmp(attribute, attribute_value) == 0) {
-			valid = 1;
-			break;
-		}
-
-		cur = cur->next;
-	}
-	
-	if(valid)
-		return cur;
-	else
-		return NULL;
 }
 
 int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur) {
@@ -171,17 +118,33 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur) {
 		free(plaintext_password);
 	}
 	printf("\n");
-
 }
 
 int dump_filezilla(int verbose, const char *output_file, const char *master_password) {
 	puts("[*] Starting FileZilla dump ...");
 
-	if(parse_sitemanager_xml() == -1) {
-		fprintf(stderr, "parse_sitemanager_xml() failure\n");
+	char filezilla_sitemanager_path[MAX_PATH_SIZE];
+	char filezilla_recentservers_path[MAX_PATH_SIZE];
+
+	load_filezilla_paths(filezilla_sitemanager_path, filezilla_recentservers_path);
+
+	int result = 0;
+
+	if(access(filezilla_sitemanager_path, 0) != -1) {
+		result = parse_sitemanager_xml(verbose, output_file, master_password, filezilla_sitemanager_path);
 	}
-	if(parse_recentserver_xml() == -1) {
-		fprintf(stderr, "parse_recentserver_xml() failure\n");
+
+	if(access(filezilla_sitemanager_path, 0) != -1) {
+		result = parse_recentservers_xml(verbose, output_file, master_password, filezilla_recentservers_path);
+	}
+
+	if(result == 0) {
+		fprintf(stderr, "[-] Couldn't find any FileZilla installation\n");
+		return -1;
+	}
+	else if (result == -1) {
+		fprintf(stderr, "[-] An error occured\n");
+		return -1;
 	}
 
 	return 1;

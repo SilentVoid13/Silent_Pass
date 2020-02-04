@@ -4,10 +4,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
-#include <libxml/xmlreader.h>
+#include "xml.h"
 
-xmlNodePtr retrieve_xml_node(xmlNodePtr cur, char *node_name);
-xmlNodePtr retrieve_xml_attribute(xmlNodePtr cur, char *attribute_name, char *attribute_value);
+int parse_sitemanager_xml(int verbose, const char *output_file, const char *master_password, char *path);
+int parse_recentservers_xml(int verbose, const char *output_file, const char *master_password, char *path);
+
+int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur);
+
+int load_filezilla_paths(char *filezilla_sitemanager_path, char *filezilla_recentservers_path);
 
 #endif // FILEZILLA_H
