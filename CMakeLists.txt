@@ -16,7 +16,7 @@ include_directories(includes includes/nss includes/nspr)
 
 ### Sources ###
 
-set(SOURCES src/chrome.c src/firefox.c src/filezilla.c src/main.c src/utilities/functions.c src/utilities/json.c src/utilities/base64.c src/utilities/xml.c)
+set(SOURCES src/chrome.c src/firefox.c src/filezilla.c src/main.c src/utilities/functions.c src/utilities/json.c src/utilities/base64.c src/utilities/xml.c src/utilities/log.c)
 
 if(WIN32)
 	set(SOURCES ${SOURCES} src/win32/chrome.c src/win32/explorer.c src/win32/firefox.c src/win32/specific.c src/win32/filezilla.c)

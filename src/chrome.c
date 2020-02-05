@@ -1,6 +1,7 @@
 #include "chrome.h"
 #include "main.h"
 
+#include "log.h"
 #include "functions.h"
 
 /** 
@@ -93,10 +94,9 @@ int get_chrome_creds(char *login_data_path, const char *output) {
 				return -1;
 			}
 
-			printf("[+] Website: %s\n[+] Username: %s\n[+] Password: %s\n\n", 
-				website,
-				username,
-				plaintext_password);
+			log_success("Website : %s", website);
+			log_success("Username: %s", username);
+			log_success("Password: %s\n", plaintext_password);
 
 			if(output != NULL) {
 				fprintf(output_fd, "\"%s\",\"%s\",\"%s\"\n", 
@@ -104,6 +104,7 @@ int get_chrome_creds(char *login_data_path, const char *output) {
 					username,
 					plaintext_password);
 			}
+
 			free(website);
 			free(username);
 			free(cipher_password);
@@ -128,7 +129,8 @@ int get_chrome_creds(char *login_data_path, const char *output) {
  * @return 1 on success, -1 on failure 
  */
 int dump_chrome(int verbose, const char *output_file) {
-	puts("[*] Starting Chrome dump...");
+	log_info("Starting Chrome dump ...\n");
+
 	int result = 0;
 	char chrome_path[MAX_PATH_SIZE];
 	char chrome_login_data_path[MAX_PATH_SIZE];
@@ -138,17 +140,16 @@ int dump_chrome(int verbose, const char *output_file) {
 	//char brave_login_data_path[MAX_PATH_SIZE];
 
 	load_chrome_paths(chrome_path, chrome_login_data_path, chromium_path, chromium_login_data_path);
-	printf("chromium login path: %s\n", chromium_login_data_path);
 
 	// TODO: S_OK / F_OK ?
 	if(access(chrome_login_data_path,0) != -1) {
-		printf("[*] Starting Chrome credentials dump...\n\n");
+		log_info("Starting Chrome credentials dump...\n");
 		result = get_chrome_creds(chrome_login_data_path, output_file);
 	}
 
 	// TODO: S_OK / F_OK ?
 	if(access(chromium_login_data_path, 0) != -1) {
-		printf("[*] Starting Chromium credentials dump...\n\n");
+		log_info("Starting Chromium credentials dump...\n");
 		result = get_chrome_creds(chromium_login_data_path, output_file);
 	} 
 

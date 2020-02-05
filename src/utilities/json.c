@@ -1,4 +1,5 @@
 #include "json.h"
+#include "log.h"
 
 /**
  * Get a JSON file data
@@ -15,7 +16,7 @@ int parse_json(char *path, char **json) {
 	long fsize = ftell(f);
 	fseek(f, 0, SEEK_SET);
 
-	printf("[*] Size of file: %ld bytes\n\n", fsize);
+	log_info("Size of file: %ld bytes\n", fsize);
 
 	*json = malloc(fsize + 1);
 	if(*json == 0) {

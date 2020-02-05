@@ -3,6 +3,7 @@
 #include "specific.h"
 #include "main.h"
 
+#include "log.h"
 #include "functions.h"
 
 
@@ -231,19 +232,20 @@ int print_decrypted_data(char *decrypted_data, char *url, const char *output_fil
 		unsigned int offset;
 		memcpy(&offset,pInfo,4);
 		if(n % 2 == 0) {
-			printf("[+] Webiste: %s\n", url);
-			printf("[+] Username: %ls\n", (wchar_t *)&decrypted_data[HeaderSize+12+offset]);
+			log_success("Website : %s", url);
+			log_success("Username : %ls", (wchar_t *)&decrypted_data[HeaderSize+12+offset]);
 			if(output_file != NULL) {
 				fprintf(output_fd, "\"%s\",\"%ls\",", url, (wchar_t *)&decrypted_data[HeaderSize+12+offset]);
 			}
 		}
 		else {
-			printf("[+] Password: %ls\n\n", (wchar_t *)&decrypted_data[HeaderSize+12+offset]);
+			log_success("Password: %ls\n", (wchar_t *)&decrypted_data[HeaderSize+12+offset]);
 			if(output_file != NULL) {
 				fprintf(output_fd, "\"%ls\"\n", (wchar_t *)&decrypted_data[HeaderSize+12+offset]);
 			}
 		}
-		// Data is 16 bytes length separated
+
+		// Data is 16 bytes length padded 
 		pInfo+=16;
 	}
 
@@ -323,9 +325,9 @@ int get_ie_vault_creds(const char *output_file) {
 		vault_items = (PVAULT_ITEM)items;
 
 		for(int j = 0; j < (int)items_counter; j++) {
-			printf("[+] Source: %ls\n", vault_items[j].FriendlyName);
-			printf("[+] Website: %ls\n", vault_items[j].Resource->data.String);
-			printf("[+] Username: %ls\n", vault_items[j].Identity->data.String);
+			log_success("Source: %ls", vault_items[j].FriendlyName);
+			log_success("Website: %ls", vault_items[j].Resource->data.String);
+			log_success("Username: %ls", vault_items[j].Identity->data.String);
 
 			pvault_items = NULL;
 			if (VaultGetItem(hVault, &vault_items[j].SchemaId, vault_items[j].Resource, vault_items[j].Identity, vault_items[j].PackageSid, NULL, 0, &pvault_items) != 0) {
@@ -334,7 +336,7 @@ int get_ie_vault_creds(const char *output_file) {
 
 			// If the password is not empty
 			if (pvault_items->Authenticator != NULL && pvault_items->Authenticator->data.String != NULL) {
-				printf("[+] Password: %ls\n\n", pvault_items->Authenticator->data.String);
+				log_success("Password: %ls\n", pvault_items->Authenticator->data.String);
 			}
 
 			// FIXME: Handle if password is empty
@@ -362,12 +364,12 @@ int get_ie_vault_creds(const char *output_file) {
  * @return 1 on success, -1 on failure 
  */
 int dump_explorer(int verbose, const char *output_file) {
-	puts("[*] Starting IE10 / MSEdge dump...\n");
+	log_info("[*] Starting IE10 / MSEdge dump...\n");
 	if(get_ie_vault_creds(output_file) == -1) {
 		fprintf(stderr, "get_ie_vault_creds() failure\n");
 	}
 
-	printf("[*] Starting IE7-IE9 dump...\n");
+	log_info("Starting IE7-IE9 dump...\n");
 	if(get_ie_registry_creds(output_file) == -1) {
 		fprintf(stderr, "get_ie7_ie9_creds() failure\n");
 	}

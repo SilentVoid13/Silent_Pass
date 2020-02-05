@@ -2,6 +2,7 @@
 #include "chrome_linux.h"
 #include "main.h"
 
+#include "log.h"
 #include "functions.h"
 
 const SecretSchema * get_chrome_like_schema (void) G_GNUC_CONST;
@@ -86,7 +87,7 @@ int aes_decrypt(EVP_CIPHER_CTX *ctx, char *cipher_password, int len_cipher_passw
 		return -1;
 	}
 
-	printf("[*] Cipher text length: %d\n", len_good_cipher);
+	log_info("Cipher text length: %d\n", len_good_cipher);
 
 	if(!(ctx = EVP_CIPHER_CTX_new())) {
 		fprintf(stderr, "EVP_CIPHER_CTX_new() failure\n");
@@ -149,7 +150,7 @@ int decrypt_gnome_cipher(char *cipher_password, int len_cipher_password, char **
 		return -1;
 	}
 
-	printf("[*] PBKDF2 key: ");
+	log_info("PBKDF2 key: ");
 	for(int i=0;i<KEY_LENGTH;i++) { 
 		printf("%02x", output_key[i]);  
 	} 

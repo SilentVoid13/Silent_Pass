@@ -1,6 +1,7 @@
 #include "firefox.h"
 #include "main.h"
 
+#include "log.h"
 #include "json.h"
 
 /**
@@ -53,10 +54,9 @@ int get_firefox_creds(char *profile_path, char *logins_path, const char *output_
 				decrypt_firefox_cipher(cipher_username->valuestring, &username);
 				decrypt_firefox_cipher(cipher_password->valuestring, &password);
 
-				printf("[*] Website: %s\n[+] Username: %s\n[+] Password: %s\n\n", 
-					hostname->valuestring,
-					username,
-					password);
+				log_success("Website : %s", hostname);
+				log_success("Username : %s", username);
+				log_success("Password : %s", password);
 
 				if(output_file != NULL) {
 					fprintf(output_fd, "\"%s\",\"%s\",\"%s\"\n", 
@@ -87,7 +87,8 @@ int get_firefox_creds(char *profile_path, char *logins_path, const char *output_
  * @return 1 on success, -1 on failure 
  */
 int dump_firefox(int verbose, const char *output_file, const char *master_password) {
-	puts("[*] Starting Firefox dump...");
+	log_info("Starting Firefox dump ...\n");
+
 	int result = 0;
 	char firefox_path[MAX_PATH_SIZE];
 	char profiles_ini_path[MAX_PATH_SIZE];
@@ -108,7 +109,7 @@ int dump_firefox(int verbose, const char *output_file, const char *master_passwo
 	
 	// TODO: S_OK / F_OK
 	if(access(logins_path, 0) != -1) {
-		printf("[*] Starting Firefox credentials dump\n\n");
+		log_info("Starting Firefox credentials dump\n");
 		result = get_firefox_creds(profile_path, logins_path, output_file, master_password);
 	}
 

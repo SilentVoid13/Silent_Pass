@@ -1,6 +1,7 @@
 #include "filezilla.h"
 #include "main.h"
 
+#include "log.h"
 #include "xml.h"
 #include "base64.h"
 #include "functions.h"
@@ -66,6 +67,7 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur) {
 	char *cipher_password = NULL;
 	char *plaintext_password = NULL;
 	char port[6] = {-1};
+	char arg[MAX_ARGUMENT];
 
 	while(cur != NULL) {
 		if (cur->type == XML_ELEMENT_NODE) {
@@ -103,25 +105,24 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur) {
 
 	printf("\n");
 	if(host != NULL) {
-		printf("[+] Host: %s\n", host);
+		log_success("Host : %s", host);
 		free(host);
 	}
 	if(port[0] != -1) {
-		printf("[+] Port: %s\n", port);
+		log_success("Port : %s", port);
 	}
 	if(username != NULL) {
-		printf("[+] Username: %s\n", username);
+		log_success("Username: %s", username);
 		free(username);
 	}
 	if(plaintext_password != NULL) {
-		printf("[+] Password : %s\n", plaintext_password);
+		log_success("Password : %s", plaintext_password);
 		free(plaintext_password);
 	}
-	printf("\n");
 }
 
 int dump_filezilla(int verbose, const char *output_file, const char *master_password) {
-	puts("[*] Starting FileZilla dump ...");
+	log_info("Starting FileZilla dump ...");
 
 	char filezilla_sitemanager_path[MAX_PATH_SIZE];
 	char filezilla_recentservers_path[MAX_PATH_SIZE];
