@@ -84,7 +84,7 @@ make install
 For Windows compiling you will need [`mingw`](https://sourceforge.net/projects/mingw-w64/)  :
 
 ```bash
-make win & cd build
+mkdir build & cd build
 cmake -G "MinGW Makefiles" ..
 mingw32-make
 mingw32-make install
