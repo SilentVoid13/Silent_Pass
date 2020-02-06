@@ -1,6 +1,6 @@
 # Silent_Pass
 
-Silent_Pass is a cross-platform browser credential harvester written in pure C.
+Silent_Pass is a cross-platform software credential harvester written in pure C.
 
 It currently supports Linux and Windows OS. 32 bit version is available, so it should work on most of the machines, even older ones.
 
@@ -12,29 +12,32 @@ Silent_Pass is licensed under the GNU AGPLv3 license. Refer to [LICENSE](https:/
 
 ## Support
 
-Silent_Pass currently support the following browsers :
+Silent_Pass currently support the following softwares :
 
 - Google Chrome
 - Mozilla Firefox
 - Internet Explorer / Microsoft Edge
 - Chromium
+- FileZilla
 
 ## Usage
 
 ```bash
-Usage: Silent_Pass [-hVvafcs] [-m password] [-o myfile]
+Usage: Silent_Pass [-hVvafcsF] [--master-firefox=password] [--master-filezilla=password] [-o filename]
   -h, --help                Display this help and exit
   -V, --version             Display version info and exit
   -v, --verbose             Verbose output
-  -a, --all                 Harvest all browsers credentials
+  -a, --all                 Harvest all softwares credentials
   -f, --firefox             Harvest Firefox credentials
   -c, --chrome              Harvest Chrome-like credentials
-  -s, --specific            Harvest OS Specific browsers credentials
-  -m, --master=password     Master password to decrypt passwords (Firefox only)
-  -o, --output=myfile       Ouput file
+  -s, --specific            Harvest OS Specific browsers credentials (e.g: IE for Windows)
+  -F, --filezilla           Harvest FileZilla credentials
+  --master-firefox=password Master password to decrypt passwords for Firefox
+  --master-filezilla=password Master password to decrypt passwords for FileZilla
+  -o, --output=filename     Output file
 ```
 
-Master Password option can only be used with Firefox (other browsers don't implement it).
+Master Password option can only be used with Firefox (currently not working on FileZilla).
 
 Output file format is in [CSV](https://en.wikipedia.org/wiki/Comma-separated_values).
 
@@ -105,6 +108,8 @@ Currently, Silent_Pass relies on the following dependencies :
 - argtable3
 - sqlite3
 - cJSON
+- zlib
+- libxml2
 
 ## Known bugs
 
