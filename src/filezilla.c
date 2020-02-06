@@ -75,7 +75,6 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, c
 	char *cipher_password = NULL;
 	char *plaintext_password = NULL;
 	char port[6] = {-1};
-	char arg[MAX_ARGUMENT];
 
 	while(cur != NULL) {
 		if (cur->type == XML_ELEMENT_NODE) {

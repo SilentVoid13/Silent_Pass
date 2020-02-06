@@ -1,6 +1,9 @@
 #ifndef XML_H
 #define XML_H
 
+#include <stdio.h>
+#include <string.h>
+
 #include <libxml/xmlreader.h>
 
 xmlNodePtr retrieve_xml_node(xmlNodePtr cur, char *node_name);
