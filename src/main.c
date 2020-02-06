@@ -19,10 +19,10 @@ int main(int argc, char** argv) {
 		help     = arg_litn("h", "help", 0, 1, "Display this help and exit"),
 		version  = arg_litn("V", "version", 0, 1, "Display version info and exit"),
 		verbose  = arg_litn("v", "verbose", 0, 1, "Verbose output"),
-		all      = arg_litn("a", "all", 0, 1, "Harvest all browsers credentials"),
+		all      = arg_litn("a", "all", 0, 1, "Harvest all softwares credentials"),
 		firefox  = arg_litn("f", "firefox", 0, 1, "Harvest Firefox credentials"),
 		chrome   = arg_litn("c", "chrome", 0, 1, "Harvest Chrome-like credentials"),
-		specific = arg_litn("s", "specific", 0, 1, "Harvest OS Specific browsers credentials"),
+		specific = arg_litn("s", "specific", 0, 1, "Harvest OS Specific browsers credentials (e.g: IE for Windows)"),
 		filezilla = arg_litn("F", "filezilla", 0, 1, "Harvest FileZilla credentials"),
 		master_firefox   = arg_strn(NULL, "master-firefox", "password", 0, 1, "Master password to decrypt passwords for Firefox"),
 		master_filezilla = arg_strn(NULL, "master-filezilla", "password", 0, 1, "Master password to decrypt passwords for FileZilla"),
@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
 	};
 
 	char *progname = "Silent_Pass";
-	char *progversion = "0.1";
+	char *progversion = "0.2";
 	char *progdate = "2020";
 	char *author_name = "SilentVoid";
 
