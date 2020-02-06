@@ -3,7 +3,7 @@
 ## Globals 
 - [x] Add Linux 32 bit support
 - [ ] Add MAC OSX Support
-- [ ] Add FileZilla support
+- [x] Add FileZilla support
 - [ ] Add Opera support
 - [ ] Add Brave Browser support
 - [ ] Refactor functions (parameter names, ...)
@@ -53,5 +53,7 @@
 
 ## For FileZilla
 - [ ] Add master password support
-- [ ] Add MinGW libxml support (for Windows)
-- [ ] Clean code / Add errors checks
+- [x] Add output file support
+- [x] Add MinGW libxml support (for Windows)
+- [ ] Add error checks
+- [ ] Clean code

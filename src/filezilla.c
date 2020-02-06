@@ -17,12 +17,16 @@ int parse_sitemanager_xml(int verbose, const char *output_file, const char *mast
 
 	cur = cur->xmlChildrenNode;
 	cur = retrieve_xml_node(cur, "Servers");
+	if(cur == NULL) {
+		fprintf(stderr, "retrieve_xml_node() failure\n");
+		return -1;
+	}
 	
 	cur = cur->xmlChildrenNode;
 	char *node_name = "Server";
 	while(cur != NULL) {
 		if(xmlStrcmp(cur->name, (const xmlChar *) node_name) == 0) {
-			parse_xml_password(doc, cur->xmlChildrenNode);	
+			parse_xml_password(doc, cur->xmlChildrenNode, output_file, master_password);	
 		}
 		cur = cur->next;
 	}
@@ -44,12 +48,16 @@ int parse_recentservers_xml(int verbose, const char *output_file, const char *ma
 
 	cur = cur->xmlChildrenNode;
 	cur = retrieve_xml_node(cur, "RecentServers");
+	if(cur == NULL) {
+		fprintf(stderr, "retrieve_xml_node() failure\n");
+		return -1;
+	}
 	
 	cur = cur->xmlChildrenNode;
 	char *node_name = "Server";
 	while(cur != NULL) {
 		if(xmlStrcmp(cur->name, (const xmlChar *) node_name) == 0) {
-			parse_xml_password(doc, cur->xmlChildrenNode);	
+			parse_xml_password(doc, cur->xmlChildrenNode, output_file, master_password);	
 		}
 		cur = cur->next;
 	}
@@ -60,7 +68,7 @@ int parse_recentservers_xml(int verbose, const char *output_file, const char *ma
 	return 1;
 }
 
-int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur) {
+int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, const char *master_password) {
 	xmlChar *key;
 	char *host = NULL;
 	char *username = NULL;
@@ -103,6 +111,15 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur) {
 		free(cipher_password);
 	}
 
+	if(output_file != NULL && host != NULL && username != NULL && plaintext_password != NULL) {
+		FILE *output_fd = fopen(output_file, "ab");
+		fprintf(output_fd, "\"%s\",\"%s\",\"%s\"\n", 
+			host,
+			username,
+			plaintext_password);
+		fclose(output_fd);
+	}
+
 	printf("\n");
 	if(host != NULL) {
 		log_success("Host : %s", host);
@@ -119,6 +136,8 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur) {
 		log_success("Password : %s", plaintext_password);
 		free(plaintext_password);
 	}
+
+	return 1;
 }
 
 int dump_filezilla(int verbose, const char *output_file, const char *master_password) {
