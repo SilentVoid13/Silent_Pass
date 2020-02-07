@@ -4,13 +4,13 @@
 int init_xml_file(xmlDocPtr *doc, xmlNodePtr *cur, char *path) {
 	*doc = xmlParseFile(path);
 	if(*doc == NULL) {
-		fprintf(stderr, "xmlReaderForFile() failure\n");
+		log_error("xmlReaderForFile() failure");
 		return -1;
 	}
 
 	*cur = xmlDocGetRootElement(*doc);
 	if(*cur == NULL) {
-		fprintf(stderr, "xmlDocGetRootElement() failure\n");
+		log_error("xmlDocGetRootElement() failure");
 		return -1;
 	}
 

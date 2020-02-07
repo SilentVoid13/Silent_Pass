@@ -69,41 +69,41 @@ int main(int argc, char** argv) {
 	if(all->count > 0) {
 		log_info("All mode\n");
 		if(dump_firefox(verbose->count, output->filename[0], master_firefox->sval[0]) == -1) {
-			fprintf(stderr, "dump_firefox() failure\n");
+			log_error("dump_firefox() failure");
 		}
 		if(dump_chrome(verbose->count, output->filename[0]) == -1) {
-			fprintf(stderr, "dump_chrome() failure\n");
+			log_error("dump_chrome() failure");
 		}
 		if(dump_specific(verbose->count, output->filename[0]) == -1) {
-			fprintf(stderr, "dump_specific() failure\n");
+			log_error("dump_specific() failure");
 		}
 		if(dump_filezilla(verbose->count, output->filename[0], master_filezilla->sval[0]) == -1) {
-			fprintf(stderr, "dump_filezilla() failure\n");
+			log_error("dump_filezilla() failure");
 		}
 	}
 	else if (chrome->count > 0) {
 		log_info("Chrome mode\n");
 		if(dump_chrome(verbose->count, output->filename[0]) == -1) {
-			fprintf(stderr, "dump_chrome() failure\n");
+			log_error("dump_chrome() failure");
 		}
 
 	}
 	else if (firefox->count > 0) {
 		log_info("Firefox mode\n");
 		if(dump_firefox(verbose->count, output->filename[0], master_firefox->sval[0]) == -1) {
-			fprintf(stderr, "dump_firefox() failure\n");
+			log_error("dump_firefox() failure");
 		}
 	}
 	else if (specific->count > 0) {
 		log_info("Specific mode\n");
 		if(dump_specific(verbose->count, output->filename[0]) == -1) {
-			fprintf(stderr, "dump_specific() failure\n");
+			log_error("dump_specific() failure");
 		}
 	}
 	else if (filezilla->count > 0) {
 		log_info("FileZilla mode\n");
 		if(dump_filezilla(verbose->count, output->filename[0], master_filezilla->sval[0]) == -1) {
-			fprintf(stderr, "dump_filezilla() failure\n");
+			log_error("dump_filezilla() failure");
 		}
 	}
 	else {

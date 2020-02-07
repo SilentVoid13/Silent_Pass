@@ -11,14 +11,14 @@ int parse_sitemanager_xml(int verbose, const char *output_file, const char *mast
 	xmlNodePtr cur;
 
 	if(init_xml_file(&doc, &cur, path) == -1) {
-		fprintf(stderr, "init_xml_file() failure\n");
+		log_error("init_xml_file() failure");
 		return -1;
 	}
 
 	cur = cur->xmlChildrenNode;
 	cur = retrieve_xml_node(cur, "Servers");
 	if(cur == NULL) {
-		fprintf(stderr, "retrieve_xml_node() failure\n");
+		log_error("retrieve_xml_node() failure");
 		return -1;
 	}
 	
@@ -42,14 +42,14 @@ int parse_recentservers_xml(int verbose, const char *output_file, const char *ma
 	xmlNodePtr cur;
 
 	if(init_xml_file(&doc, &cur, path) == -1) {
-		fprintf(stderr, "init_xml_file() failure\n");
+		log_error("init_xml_file() failure");
 		return -1;
 	}
 
 	cur = cur->xmlChildrenNode;
 	cur = retrieve_xml_node(cur, "RecentServers");
 	if(cur == NULL) {
-		fprintf(stderr, "retrieve_xml_node() failure\n");
+		log_error("retrieve_xml_node() failure");
 		return -1;
 	}
 	
@@ -104,7 +104,7 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, c
 			free(username);
 			free(cipher_password);
 			free(host);
-			fprintf(stderr, "base64_decode() failure\n");
+			log_error("base64_decode() failure");
 			return -1;
 		}
 		free(cipher_password);
@@ -158,11 +158,11 @@ int dump_filezilla(int verbose, const char *output_file, const char *master_pass
 	}
 
 	if(result == 0) {
-		fprintf(stderr, "[-] Couldn't find any FileZilla installation\n");
+		log_error("Couldn't find any FileZilla installation");
 		return -1;
 	}
 	else if (result == -1) {
-		fprintf(stderr, "[-] An error occured\n");
+		log_error("An error occured");
 		return -1;
 	}
 

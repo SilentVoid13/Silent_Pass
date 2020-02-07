@@ -44,18 +44,18 @@ int get_gnome_masterkey(char *login_data_path, char **masterkey) {
 	GError *error = NULL;
 	gchar *password = secret_password_lookup_sync(CHROME_LIKE_SCHEMA, NULL, &error, "application", chrome, NULL);
 	if (error != NULL) {
-		fprintf(stderr, "secret_password_lookup_sync() failure\n");
+		log_error("secret_password_lookup_sync() failure");
 		g_error_free(error);
 		return -1;
 	}
 	else if (password == NULL) {
-		fprintf(stderr, "secret_password_lookup_sync() failure\n");
+		log_error("secret_password_lookup_sync() failure");
 		return -1;
 	}
 	else {
 		*masterkey = (char *)malloc(strlen(password)+1); 
 		if(*masterkey == 0) {
-			fprintf(stderr, "malloc() failure\n");
+			log_error("malloc() failure");
 			free(*masterkey);
 			return -1;
 		}
@@ -82,7 +82,7 @@ int aes_decrypt(EVP_CIPHER_CTX *ctx, char *cipher_password, int len_cipher_passw
 	// The ciphertext is always greater or equal to the length of the plaintext
 	*plaintext_password = (unsigned char *)malloc(len_good_cipher);
 	if(*plaintext_password == 0) {
-		fprintf(stderr, "malloc() failure\n");
+		log_error("malloc() failure");
 		free(*plaintext_password);
 		return -1;
 	}
@@ -90,11 +90,11 @@ int aes_decrypt(EVP_CIPHER_CTX *ctx, char *cipher_password, int len_cipher_passw
 	log_info("Cipher text length: %d\n", len_good_cipher);
 
 	if(!(ctx = EVP_CIPHER_CTX_new())) {
-		fprintf(stderr, "EVP_CIPHER_CTX_new() failure\n");
+		log_error("EVP_CIPHER_CTX_new() failure");
 		return -1;
 	}
 	if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, output_key, iv)) {
-		fprintf(stderr, "EVP_DecryptInit_ex() failure\n");
+		log_error("EVP_DecryptInit_ex() failure");
 		ERR_print_errors_fp(stderr);
 		return -1;
 	}
@@ -103,14 +103,14 @@ int aes_decrypt(EVP_CIPHER_CTX *ctx, char *cipher_password, int len_cipher_passw
 	//EVP_CIPHER_CTX_set_padding(ctx, 0);
 
 	if(1 != EVP_DecryptUpdate(ctx, *plaintext_password, &len, good_cipher_password, len_good_cipher)) {
-		fprintf(stderr, "EVP_DecryptUpdate() failure\n");
+		log_error("EVP_DecryptUpdate() failure");
 		ERR_print_errors_fp(stderr);
 		return -1;
 	}
 	plaintext_len = len;
 
 	if(1 != EVP_DecryptFinal_ex(ctx, *plaintext_password+len, &len)) {
-		fprintf(stderr, "EVP_DecryptFinal_ex() failure\n");
+		log_error("EVP_DecryptFinal_ex() failure");
 		ERR_print_errors_fp(stderr);
 		return -1;
 	}
@@ -128,7 +128,7 @@ int aes_decrypt(EVP_CIPHER_CTX *ctx, char *cipher_password, int len_cipher_passw
  */
 int get_masterkey(char *login_data_path, char **masterkey) {
 	if(get_gnome_masterkey(login_data_path, masterkey) == -1) {
-		fprintf(stderr, "get_gnome_masterkey() failure\n");
+		log_error("get_gnome_masterkey() failure");
 		return -1;
 	}
 
@@ -146,7 +146,7 @@ int decrypt_gnome_cipher(char *cipher_password, int len_cipher_password, char **
 	unsigned char output_key[KEY_LENGTH];
 	char *salt = "saltysalt";
 	if(PKCS5_PBKDF2_HMAC(masterkey, strlen(masterkey), salt, strlen(salt), 1, EVP_sha1(), KEY_LENGTH, output_key) == 0) {
-		fprintf(stderr, "PKCS5_PBKDF2_HMAC() failure\n");
+		log_error("PKCS5_PBKDF2_HMAC() failure");
 		return -1;
 	}
 
@@ -160,7 +160,7 @@ int decrypt_gnome_cipher(char *cipher_password, int len_cipher_password, char **
 	char *iv = "                ";
 
 	if(aes_decrypt(ctx, cipher_password, len_cipher_password, plaintext_password, iv, output_key) == -1) {
-		fprintf(stderr, "aes_decrypt() failure\n");
+		log_error("aes_decrypt() failure");
 		return -1;
 	}
 

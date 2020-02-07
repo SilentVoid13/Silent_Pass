@@ -37,7 +37,7 @@ int load_firefox_libs() {
 
         snprintf(pathDll, MAX_PATH_SIZE, "%s\\%s", pathFirefox, "nss3.dll");
         if(!(moduleNSS = LoadLibrary(pathDll))) {
-		fprintf(stderr, "nss3.dll Loading failure\n");
+		log_error("nss3.dll Loading failure");
                 return -1;
 	}
  
@@ -55,7 +55,7 @@ int load_firefox_libs() {
 	//SECItem_FreeItem = (SECItemFreeItem)GetProcAddress(moduleNSS, "SECItem_FreeItem");
 
 	if(!NSS_Init || !PK11_GetInternalKeySlot || !PK11_Authenticate || !PK11SDR_Decrypt || !PL_Base64Decode || !PK11_CheckUserPassword || !NSS_Shutdown || !PK11_FreeSlot) {
-		fprintf(stderr, "GetProcAddress() failure\n");
+		log_error("GetProcAddress() failure");
 		FreeLibrary(moduleNSS);
 		return -1;
 	}
@@ -111,7 +111,7 @@ int decrypt_firefox_cipher(char *ciphered, char **plaintext) {
 
 	char *decoded_cipher = (char *)malloc(len+1);
 	if(decoded_cipher == 0) {
-		fprintf(stderr, "malloc() failure\n");
+		log_error("malloc() failure");
 		free(request.data);
 		free(decoded_cipher);
 		return -1;
@@ -122,7 +122,7 @@ int decrypt_firefox_cipher(char *ciphered, char **plaintext) {
 	//request = NSSBase64_DecodeBuffer(NULL, NULL, ciphered, len);
 
 	if(PL_Base64Decode(ciphered, strlen(ciphered), decoded_cipher) == 0) {
-		fprintf(stderr, "PL_Base64Decode() failure\n");
+		log_error("PL_Base64Decode() failure");
 		free(request.data);
 		return -1;
 	}
@@ -130,13 +130,13 @@ int decrypt_firefox_cipher(char *ciphered, char **plaintext) {
 	free(decoded_cipher);
 
 	if(PK11SDR_Decrypt(&request, &response, NULL) == -1) {
-		fprintf(stderr, "PK11SDR_Decrypt() failure\n");
+		log_error("PK11SDR_Decrypt() failure");
 		return -1;
 	}
 
 	*plaintext = malloc(response.len + 1);
 	if(*plaintext == 0) {
-		fprintf(stderr, "malloc() failure\n");
+		log_error("malloc() failure");
 		free(*plaintext);
 		return -1;
 	}
@@ -157,35 +157,35 @@ int decrypt_firefox_cipher(char *ciphered, char **plaintext) {
 int nss_authenticate(char *profile_path, void *key_slot, const char *master_password) {
 	load_firefox_libs();
 	if(NSS_Init(profile_path) != SECSuccess) {
-		fprintf(stderr, "NSS Initialisation failed\n");
+		log_error("NSS Initialisation failed");
 		fflush(stderr);
 		return -1;
 	}
 
 	// We get the key[3-4].db file
 	if((key_slot = PK11_GetInternalKeySlot()) == NULL) {
-		fprintf(stderr, "PK11_GetInternalKeySlot() failed\n");
+		log_error("PK11_GetInternalKeySlot() failed");
 		fflush(stderr);
 		return -1;
 	}
 
 	if(master_password != NULL) {
 		if(PK11_CheckUserPassword(key_slot, master_password) != SECSuccess) {
-			fprintf(stderr, "PK11_CheckUserPassword() failed, Wrong master password\n");
+			log_error("PK11_CheckUserPassword() failed, Wrong master password");
 			fflush(stderr);
 			return -1;
 		}
 	} else {
 		// We check if we can open it with no password
 		if(PK11_CheckUserPassword(key_slot, "") != SECSuccess) {
-			fprintf(stderr, "PK11_CheckUserPassword() failed, Try with -m <PASSWORD> option\n");
+			log_error("PK11_CheckUserPassword() failed, Try with -m <PASSWORD> option");
 			fflush(stderr);
 			return -1;
 		}
 	}
 
 	if(PK11_Authenticate(key_slot, TRUE, NULL) != SECSuccess) {
-		fprintf(stderr, "PK11_Authenticate() failed\n");
+		log_error("PK11_Authenticate() failed");
 		fflush(stderr);
 		return -1;
 	}

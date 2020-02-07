@@ -19,6 +19,9 @@
 void log_success(char *msg, ...);
 void log_info(char *msg, ...);
 void log_error(char *msg, ...);
+void log_progress(char *msg, ...);
+
 void log_format(const char* message, va_list args);
+void log_format_error(const char *message, va_list args);
 
 #endif // LOG_H

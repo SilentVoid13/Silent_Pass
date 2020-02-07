@@ -9,7 +9,7 @@
 int parse_json(char *path, char **json) {
 	FILE *f = fopen(path, "rb"); 
 	if(f == NULL) {
-		fprintf(stderr, "fopen() failure\n");
+		log_error("fopen() failure");
 		return -1;
 	}
 	fseek(f, 0, SEEK_END);
@@ -20,7 +20,7 @@ int parse_json(char *path, char **json) {
 
 	*json = malloc(fsize + 1);
 	if(*json == 0) {
-		fprintf(stderr, "malloc() failure\n");
+		log_error("malloc() failure");
 		free(*json);
 		fclose(f);
 		return -1;

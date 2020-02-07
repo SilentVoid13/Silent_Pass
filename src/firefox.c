@@ -12,19 +12,19 @@
 int get_firefox_creds(char *profile_path, char *logins_path, const char *output_file, const char *master_password) {
 	void* key_slot = NULL; 
 	if((nss_authenticate(profile_path, key_slot, master_password)) == -1) {
-		fprintf(stderr, "nss_authenticate failure()\n");
+		log_error("nss_authenticate failure()");
 		return -1;
 	}
 
 	char *json;
 	if(parse_json(logins_path, &json) == -1) {
-		fprintf(stderr, "parse_json failed()\n");
+		log_error("parse_json failed()");
 		return -1;
 	}
 
 	cJSON* values = cJSON_Parse(json);
 	if(values == NULL) {
-		fprintf(stderr, "cJSON_Parse() failed\n");
+		log_error("cJSON_Parse() failed");
 		fflush(stderr);
 		return -1;
 	}
@@ -99,8 +99,8 @@ int dump_firefox(int verbose, const char *output_file, const char *master_passwo
 	load_firefox_paths(firefox_path, profiles_ini_path);
 
 	if(get_profile(profiles_ini_path, profile) == -1) {
-		fprintf(stderr, "get_profile() failure\n");
-		fprintf(stderr, "[-] Couldn't find any Firefox installation (No profile found)\n");
+		log_error("get_profile() failure");
+		log_error("Couldn't find any Firefox installation (No profile found)");
 		return -1;
 	}
 
@@ -114,11 +114,11 @@ int dump_firefox(int verbose, const char *output_file, const char *master_passwo
 	}
 
 	if(result == -1) {
-		fprintf(stderr, "[-] An error occured\n");
+		log_error("An error occured");
 		return -1;
 	}
 	else if(result == 0) {
-		fprintf(stderr, "[-] Couldn't find any Firefox installation (No logins.json file found)\n");
+		log_error("Couldn't find any Firefox installation (No logins.json file found)");
 		return -1;
 	}
 	return 1;

@@ -28,12 +28,12 @@ int dpapi_decrypt_entropy(char *cipher_data, int len_cipher_data, wchar_t *entro
 	entropy_blob.pbData = (unsigned char *)entropy_password;
 
 	if(!CryptUnprotectData(&encrypted_blob, NULL, &entropy_blob, NULL, NULL, 0, &decrypted_blob)) {
-		fprintf(stderr, "CryptUnprotectData() failure\n");
+		log_error("CryptUnprotectData() failure");
 		return -1;
 	}
 	*plaintext_data = malloc(decrypted_blob.cbData + 1);
 	if(*plaintext_data == 0) {
-		fprintf(stderr, "malloc() failure\n");
+		log_error("malloc() failure");
 		free(*plaintext_data);
 		return -1;
 	}
@@ -55,7 +55,7 @@ int get_registry_history(IEUrl *urls, int *n_urls, int nHowMany) {
 	DWORD dwLength, dwType;
 	
 	if(RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Microsoft\\Internet Explorer\\TypedURLs", 0, KEY_QUERY_VALUE, &hKey) != ERROR_SUCCESS) {
-		fprintf(stderr, "RegOpenKeyEx() failure\n");
+		log_error("RegOpenKeyEx() failure");
 		return -1;
 	}
 	
@@ -66,7 +66,7 @@ int get_registry_history(IEUrl *urls, int *n_urls, int nHowMany) {
 		if(RegQueryValueExA(hKey, szTemp, NULL, NULL, NULL, &dwLength) == ERROR_SUCCESS){
 			char *szURL = (char *)malloc(dwLength+1);
 			if(szURL == 0) {
-				fprintf(stderr, "malloc() failure\n");
+				log_error("malloc() failure");
 				return -1;
 			}
 			if(RegQueryValueExA(hKey, szTemp, NULL, &dwType, szURL, &dwLength) == ERROR_SUCCESS){
@@ -161,13 +161,13 @@ int get_ie_registry_creds(const char *output_file) {
 	int n_urls = 0;
 	add_known_websites(urls, &n_urls);
 	if(get_registry_history(urls, &n_urls, MAX_URL_HISTORY - n_urls) == -1) {
-		fprintf(stderr, "get_registry_history() failure\n");
+		log_error("get_registry_history() failure");
 	}
 	// get_ie_history(urls);
 
 	HKEY hKey;
 	if(ERROR_SUCCESS != RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Microsoft\\Internet Explorer\\IntelliForms\\Storage2", 0, KEY_QUERY_VALUE, &hKey)) {
-		fprintf(stderr, "RegOpenKeyEx() failure\n");
+		log_error("RegOpenKeyEx() failure");
 		return -1;
 	} 
 
@@ -185,11 +185,11 @@ int get_ie_registry_creds(const char *output_file) {
 				int len_cipher_data = CIPHER_SIZE_MAX;
 				char cipher_data[len_cipher_data];
 				if(RegQueryValueEx(hKey, reg_hash, 0, &size, cipher_data, (long unsigned int *)&len_cipher_data) != ERROR_SUCCESS) {
-					fprintf(stderr, "RegQueryValueEx() failure\n");
+					log_error("RegQueryValueEx() failure");
 				};
 
 				if(dpapi_decrypt_entropy(cipher_data, len_cipher_data, urls[j].utf_url, (wcslen(urls[j].utf_url)+1)*2, &decrypted_data) == -1) {
-					fprintf(stderr, "dpapi_decrypt() failure\n");
+					log_error("dpapi_decrypt() failure");
 				}
 				print_decrypted_data(decrypted_data, urls[j].url, output_file);
 				free(decrypted_data);
@@ -263,7 +263,7 @@ int print_decrypted_data(char *decrypted_data, char *url, const char *output_fil
 int load_ie_vault_libs() {
 	module_vault = LoadLibrary("vaultcli.dll");
 	if(module_vault == NULL) {
-		fprintf(stderr, "LoadLibary() failure\n");
+		log_error("LoadLibary() failure");
 		return -1;
 	}
 
@@ -275,7 +275,7 @@ int load_ie_vault_libs() {
 	VaultFree = (VaultFree_t)GetProcAddress(module_vault, "VaultFree");
 
 	if (!VaultEnumerateItems || !VaultEnumerateVaults || !VaultFree || !VaultOpenVault || !VaultCloseVault || !VaultGetItem) {
-		fprintf(stderr, "GetProcAddress() failure\n");
+		log_error("GetProcAddress() failure");
 		FreeLibrary(module_vault);
 		return -1;						
 	}
@@ -290,7 +290,7 @@ int load_ie_vault_libs() {
  */
 int get_ie_vault_creds(const char *output_file) {
 	if(load_ie_vault_libs() == -1) {
-		fprintf(stderr, "load_explorer_libs() failure\n");
+		log_error("load_explorer_libs() failure");
 		return -1;
 	}
 
@@ -302,7 +302,7 @@ int get_ie_vault_creds(const char *output_file) {
 	//PVAULT_ITEM_7 vault_test, pvault_test;
 
 	if(VaultEnumerateVaults(0, &vaults_counter, &vaults) != ERROR_SUCCESS) {
-		fprintf(stderr, "VaultEnumerateVaults() failure\n");
+		log_error("VaultEnumerateVaults() failure");
 		return -1;
 	}
 
@@ -314,12 +314,12 @@ int get_ie_vault_creds(const char *output_file) {
 	for(int i = 0; i < (int)vaults_counter; i++) {
 		// We open the vault
 		if (VaultOpenVault(&vaults[i], 0, &hVault) != ERROR_SUCCESS) {
-			fprintf(stderr, "VaultOpenVault() failure\n");
+			log_error("VaultOpenVault() failure");
 			return -1;
 		}
 
 		if (VaultEnumerateItems(hVault, 512, &items_counter, &items) != ERROR_SUCCESS) {
-			fprintf(stderr, "VaultEnumerateItems() failure\n");
+			log_error("VaultEnumerateItems() failure");
 			return -1;
 		}
 		vault_items = (PVAULT_ITEM)items;
@@ -331,7 +331,7 @@ int get_ie_vault_creds(const char *output_file) {
 
 			pvault_items = NULL;
 			if (VaultGetItem(hVault, &vault_items[j].SchemaId, vault_items[j].Resource, vault_items[j].Identity, vault_items[j].PackageSid, NULL, 0, &pvault_items) != 0) {
-				fprintf(stderr, "VaultGetItem() failure\n");		
+				log_error("VaultGetItem() failure");	
 			}
 
 			// If the password is not empty
@@ -366,12 +366,12 @@ int get_ie_vault_creds(const char *output_file) {
 int dump_explorer(int verbose, const char *output_file) {
 	log_info("[*] Starting IE10 / MSEdge dump...\n");
 	if(get_ie_vault_creds(output_file) == -1) {
-		fprintf(stderr, "get_ie_vault_creds() failure\n");
+		log_error("get_ie_vault_creds() failure");
 	}
 
 	log_info("Starting IE7-IE9 dump...\n");
 	if(get_ie_registry_creds(output_file) == -1) {
-		fprintf(stderr, "get_ie7_ie9_creds() failure\n");
+		log_error("get_ie7_ie9_creds() failure");
 	}
 	
 	return 1;

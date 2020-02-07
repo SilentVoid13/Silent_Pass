@@ -13,7 +13,7 @@ int get_profile(char* profiles_ini_path, char* profile) {
 	ini = iniparser_load(profiles_ini_path);
 
 	if(ini == NULL) {
-		fprintf(stderr, "Cannot parse file: %s\n", profiles_ini_path);
+		log_error("Cannot parse file: %s", profiles_ini_path);
 		return -1;
 	}
 	
@@ -55,7 +55,7 @@ int decrypt_firefox_cipher(char *ciphered, char **plaintext) {
 
 	*plaintext = malloc(response->len + 1);
 	if(*plaintext == 0) {
-		fprintf(stderr, "malloc() failure\n");
+		log_error("malloc() failure");
 		free(*plaintext);
 		return -1;
 	}
@@ -75,35 +75,35 @@ int decrypt_firefox_cipher(char *ciphered, char **plaintext) {
  */
 int nss_authenticate(char *profile_path, void *key_slot, const char *master_password) {
 	if(NSS_Init(profile_path) != SECSuccess) {
-		fprintf(stderr, "NSS Initialisation failed\n");
+		log_error("NSS Initialisation failed");
 		fflush(stderr);
 		return -1;
 	}
 
 	// We get the key[3-4].db file
 	if((key_slot = PK11_GetInternalKeySlot()) == NULL) {
-		fprintf(stderr, "PK11_GetInternalKeySlot() failed\n");
+		log_error("PK11_GetInternalKeySlot() failed");
 		fflush(stderr);
 		return -1;
 	}
 
 	if(master_password != NULL) {
 		if(PK11_CheckUserPassword(key_slot, master_password) != SECSuccess) {
-			fprintf(stderr, "PK11_CheckUserPassword() failed, Wrong master password\n");
+			log_error("PK11_CheckUserPassword() failed, Wrong master password");
 			fflush(stderr);
 			return -1;
 		}
 	} else {
 		// We check if we can open it with no password
 		if(PK11_CheckUserPassword(key_slot, "") != SECSuccess) {
-			fprintf(stderr, "PK11_CheckUserPassword() failed, Try with -m <password> option\n");
+			log_error("PK11_CheckUserPassword() failed, Try with -m <password> option");
 			fflush(stderr);
 			return -1;
 		}
 	}
 
 	if(PK11_Authenticate(key_slot, TRUE, NULL) != SECSuccess) {
-		fprintf(stderr, "PK11_Authenticate() failed\n");
+		log_error("PK11_Authenticate() failed");
 		fflush(stderr);
 		return -1;
 	}
