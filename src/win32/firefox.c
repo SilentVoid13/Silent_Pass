@@ -3,6 +3,8 @@
 #include "main.h"
 
 #include "functions.h"
+#include "base64.h"
+#include "log.h"
 
 // We define some variables to hold our functions
 NSSInit NSS_Init;

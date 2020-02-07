@@ -15,4 +15,6 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, c
 
 int load_filezilla_paths(char *filezilla_sitemanager_path, char *filezilla_recentservers_path);
 
+int dump_filezilla(int verbose, const char *output_file, const char *master_password);
+
 #endif // FILEZILLA_H

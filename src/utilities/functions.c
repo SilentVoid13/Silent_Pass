@@ -1,5 +1,7 @@
 #include "functions.h"
 
+#include "log.h"
+
 /**
  * Safe wrapper to use strncpy()
  *

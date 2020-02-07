@@ -110,6 +110,7 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, c
 		free(cipher_password);
 	}
 
+	// We only add to input file when we have full creds (Maybe change that ?)
 	if(output_file != NULL && host != NULL && username != NULL && plaintext_password != NULL) {
 		FILE *output_fd = fopen(output_file, "ab");
 		fprintf(output_fd, "\"%s\",\"%s\",\"%s\"\n", 

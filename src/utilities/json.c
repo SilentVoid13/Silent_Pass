@@ -1,4 +1,5 @@
 #include "json.h"
+
 #include "log.h"
 
 /**
@@ -20,12 +21,12 @@ int parse_json(char *path, char **json) {
 
 	*json = malloc(fsize + 1);
 	if(*json == 0) {
-		log_error("malloc() failure");
 		free(*json);
 		fclose(f);
+		log_error("malloc() failure");
 		return -1;
 	}
-	fread(*json, 1, fsize, f);
+	fread(*json, fsize, 1, f);
 	fclose(f);
 	
 	return 1;

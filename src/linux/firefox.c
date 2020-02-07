@@ -2,6 +2,8 @@
 #include "firefox.h"
 #include "main.h"
 
+#include "log.h"
+
 /**
  * Get the Linux Firefox profile
  *

@@ -7,7 +7,7 @@
 - [ ] Add Opera support
 - [ ] Add Brave Browser support
 - [ ] Refactor functions (parameter names, ...)
-- [ ] Make clean Makefile (use cmake ?)
+- [x] Make clean Makefile (use cmake ?)
 - [x] Create the README file
 - [x] Add Code Documentation
 - [x] Add Internet Explorer V7-9 support 
@@ -19,16 +19,16 @@
 ## For Chrome
 
 ### Global
-- [ ] Better alternative to malloc / strncpy (maybe memcpy / memset)
+- [x] Better alternative to malloc / strncpy (maybe memcpy / memset)
 - [x] Handle cipher text length problem
 
 ### Linux
 - [ ] Implement plain text / KWallet support
 
 ### Windows
-- [ ] Fix get_base64_dpapi_key() to use base64.c 
 - [ ] Fix cJSON segfault problem (or change JSON lib)
 - [ ] Find a better way to check for the version prefix
+- [x] Fix get_base64_dpapi_key() to use base64.c 
 - [x] Split decrypt_chrome_cipher() 
 - [x] Fix aead_decrypt() problem
 - [x] Fix masterkey problem
@@ -53,7 +53,7 @@
 
 ## For FileZilla
 - [ ] Add master password support
+- [ ] Clean code
 - [x] Add output file support
 - [x] Add MinGW libxml support (for Windows)
-- [ ] Add error checks
-- [ ] Clean code
+- [x] Add error checks

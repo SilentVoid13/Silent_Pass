@@ -5,6 +5,7 @@
 #include "json.h"
 #include "base64.h"
 #include "functions.h"
+#include "log.h"
 
 /**
  * DPAPI decrypt with any password (user password)
@@ -125,6 +126,7 @@ int get_json_base64_key(char **b64_key) {
 	// FIXME: cJSON_Parse causes SEGFault, try to fix that.
 	cJSON* values = cJSON_Parse(json);
 	if(values == NULL) {
+		free(json);
 		log_error("cJSON_Parse() failed");
 		fflush(stderr);
 		return -1;
@@ -137,9 +139,10 @@ int get_json_base64_key(char **b64_key) {
 	b64_encrypted_key = cJSON_GetObjectItemCaseSensitive(os_crypt, "encrypted_key");
 
 	*b64_key = malloc(strlen(b64_encrypted_key->valuestring)+1); 
-	if(*b64_key == 0) {
-		log_error("malloc() failure");
+	if(*b64_key == NULL) {
+		free(json);
 		free(*b64_key);
+		log_error("malloc() failure");
 		return -1;
 	}
 	safe_strcpy(*b64_key, b64_encrypted_key->valuestring, strlen(b64_encrypted_key->valuestring));
@@ -163,27 +166,12 @@ int get_base64_dpapi_key(char **key, int *key_len) {
 		return -1;
 	}
 
-	BIO *bio, *b64;
-	int decodeLen = calc_base64_length(base64_key);
-	*key = malloc(decodeLen+1);
-	if(*key == 0) {
-		log_error("malloc() failure");
-		free(key);
-		return -1;
-	}
-	(*key)[decodeLen] = '\0';
-
-	bio = BIO_new_mem_buf(base64_key, -1);
-	b64 = BIO_new(BIO_f_base64());
-	bio = BIO_push(b64, bio);
-	BIO_set_flags(bio, BIO_FLAGS_BASE64_NO_NL); 
-	*key_len = BIO_read(bio, *key, strlen(base64_key));
-	if(*key_len != decodeLen) {
-		log_error("Base64 decoding error");
+	if(base64_decode(base64_key, key, key_len) == -1) {
+		free(base64_key);
+		log_error("base64_decode() failure");
 		return -1;
 	}
 	free(base64_key);
-	BIO_free_all(bio);
 
 	return 1;
 }

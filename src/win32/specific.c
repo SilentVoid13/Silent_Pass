@@ -3,6 +3,7 @@
 #include "main.h"
 
 #include "explorer.h"
+#include "log.h"
 
 /**
  * Specific functions wrapper that sets up everything we need

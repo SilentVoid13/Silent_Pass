@@ -21,4 +21,8 @@ int _fprintf_w32(FILE* fp, const char* format, ...);
 
 #define printf(...) _fprintf_w32(stdout, __VA_ARGS__)
 
+// For errors
+#define fprintf(...) _fprintf_w32(__VA_ARGS__)
+
+
 #endif // LOG_WIN_H

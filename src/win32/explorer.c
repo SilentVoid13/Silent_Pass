@@ -364,7 +364,7 @@ int get_ie_vault_creds(const char *output_file) {
  * @return 1 on success, -1 on failure 
  */
 int dump_explorer(int verbose, const char *output_file) {
-	log_info("[*] Starting IE10 / MSEdge dump...\n");
+	log_info("Starting IE10 / MSEdge dump...\n");
 	if(get_ie_vault_creds(output_file) == -1) {
 		log_error("get_ie_vault_creds() failure");
 	}

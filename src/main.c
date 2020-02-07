@@ -1,6 +1,7 @@
 #include "main.h"
 #include "firefox.h"
 #include "chrome.h"
+#include "filezilla.h"
 
 #include "log.h"
 

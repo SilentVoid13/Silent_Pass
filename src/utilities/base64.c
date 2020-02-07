@@ -1,5 +1,7 @@
 #include "base64.h"
 
+#include "log.h"
+
 // Based on :
 // https://gist.github.com/barrysteyn/7308212
 
@@ -37,6 +39,7 @@ int base64_decode(char* b64message, char** buffer, int* length) {
 	BIO_set_flags(bio, BIO_FLAGS_BASE64_NO_NL); 
 	*length = BIO_read(bio, *buffer, strlen(b64message));
 	if(*length != decodeLen) {
+		free(*buffer);
 		log_error("Base64 decoding error");
 		return -1;
 	}

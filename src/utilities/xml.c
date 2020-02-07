@@ -1,5 +1,6 @@
 #include "xml.h"
-#include "main.h"
+
+#include "log.h"
 
 int init_xml_file(xmlDocPtr *doc, xmlNodePtr *cur, char *path) {
 	*doc = xmlParseFile(path);
