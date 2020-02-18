@@ -56,7 +56,7 @@ int get_firefox_creds(char *profile_path, char *logins_path, const char *output_
 
 				log_success("Website : %s", hostname->valuestring);
 				log_success("Username : %s", username);
-				log_success("Password : %s", password);
+				log_success("Password : %s\n", password);
 
 				if(output_file != NULL) {
 					fprintf(output_fd, "\"%s\",\"%s\",\"%s\"\n", 
@@ -109,6 +109,7 @@ int dump_firefox(const char *output_file, const char *master_password) {
 	
 	// TODO: S_OK / F_OK
 	if(access(logins_path, 0) != -1) {
+	    log_verbose("Firefox path : %s", logins_path);
 		log_info("Starting Firefox credentials dump\n");
 		result = get_firefox_creds(profile_path, logins_path, output_file, master_password);
 	}

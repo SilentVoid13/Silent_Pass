@@ -181,7 +181,7 @@ int nss_authenticate(char *profile_path, void *key_slot, const char *master_pass
 	} else {
 		// We check if we can open it with no password
 		if(PK11_CheckUserPassword(key_slot, "") != SECSuccess) {
-			log_error("PK11_CheckUserPassword() failed, Try with -m <PASSWORD> option");
+			log_error("PK11_CheckUserPassword() failed, Try with --master-firefox <PASSWORD> option");
 			fflush(stderr);
 			return -1;
 		}

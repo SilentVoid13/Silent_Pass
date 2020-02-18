@@ -30,6 +30,7 @@ int parse_sitemanager_xml(const char *output_file, const char *master_password, 
 		}
 		cur = cur->next;
 	}
+    printf("\n");
 
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
@@ -61,6 +62,7 @@ int parse_recentservers_xml(const char *output_file, const char *master_password
 		}
 		cur = cur->next;
 	}
+	printf("\n");
 
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
@@ -82,20 +84,24 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, c
 	while(cur != NULL) {
 		if (cur->type == XML_ELEMENT_NODE) {
 			key = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
-			size_t key_len = strlen(key);
+			size_t key_len;
 			if(strcmp(cur->name, "User") == 0) {
+                key_len = strlen(key);
 				username = malloc(key_len+1);
 				safe_strcpy(username, key, key_len);
 			}
 			else if(strcmp(cur->name, "Pass") == 0) {
+                key_len = strlen(key);
 				cipher_password = malloc(key_len+1);
 				safe_strcpy(cipher_password, key, key_len);
 			}
 			else if(strcmp(cur->name, "Host") == 0) {
+                key_len = strlen(key);
 				host = malloc(key_len+1);
 				safe_strcpy(host, key, key_len);
 			}
 			else if(strcmp(cur->name, "Port") == 0) {
+                key_len = strlen(key);
 				safe_strcpy(port, key, key_len);
 			}
 		}
@@ -145,7 +151,7 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, c
 }
 
 int dump_filezilla(const char *output_file, const char *master_password) {
-	log_info("Starting FileZilla dump ...");
+	log_info("Starting FileZilla dump ...\n");
 
 	char filezilla_sitemanager_path[MAX_PATH_SIZE];
 	char filezilla_recentservers_path[MAX_PATH_SIZE];
@@ -155,10 +161,14 @@ int dump_filezilla(const char *output_file, const char *master_password) {
 	int result = 0;
 
 	if(access(filezilla_sitemanager_path, 0) != -1) {
+	    log_verbose("FileZilla sitemanager path : %s", filezilla_sitemanager_path);
+	    log_info("Starting FileZilla sitemanager dump ...");
 		result = parse_sitemanager_xml(output_file, master_password, filezilla_sitemanager_path);
 	}
 
-	if(access(filezilla_sitemanager_path, 0) != -1) {
+	if(access(filezilla_recentservers_path, 0) != -1) {
+        log_verbose("FileZilla recentservers path : %s", filezilla_recentservers_path);
+        log_info("Starting FileZilla recentservers dump ...");
 		result = parse_recentservers_xml(output_file, master_password, filezilla_recentservers_path);
 	}
 

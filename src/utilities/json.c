@@ -17,7 +17,7 @@ int parse_json(char *path, char **json) {
 	long fsize = ftell(f);
 	fseek(f, 0, SEEK_SET);
 
-	log_info("Size of file: %ld bytes\n", fsize);
+	log_verbose("Size of file: %ld bytes\n", fsize);
 
 	*json = malloc(fsize + 1);
 	if(*json == 0) {

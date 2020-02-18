@@ -42,8 +42,7 @@ int main(int argc, char** argv) {
 	output->filename[0] = NULL;
 	master_firefox->sval[0] = NULL;
 	master_filezilla->sval[0] = NULL;
-	verbose = verb->count;
-	
+
 	int nerrors;
 	nerrors = arg_parse(argc, argv, argtable);
 
@@ -65,6 +64,9 @@ int main(int argc, char** argv) {
 		printf("Try '%s --help' for more informations.\n", progname);
 		exit(1);
 	}
+
+
+    verbose = verb->count;
 
 	// We remove the file if it already exists to write to it (with append mode)
 	if(output->filename[0] != NULL) {
@@ -119,5 +121,5 @@ int main(int argc, char** argv) {
 	}
 
 	arg_freetable(argtable, sizeof(argtable) / sizeof(argtable[0]));
-	return 0;
+	return 1;
 }
