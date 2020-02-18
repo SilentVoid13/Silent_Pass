@@ -42,6 +42,7 @@ int aead_decrypt(char *cipher_password, int len_cipher_password, char *key, char
 	EVP_CIPHER_CTX *ctx;
 	int len;
 	int plaintext_len;
+    (void) len_iv;
 
 	// The tag is appended at the end of the cipher data
 	int tag_offset = len_cipher_password-16;
@@ -145,7 +146,8 @@ int get_json_base64_key(char **b64_key) {
 		log_error("malloc() failure");
 		return -1;
 	}
-	safe_strcpy(*b64_key, b64_encrypted_key->valuestring, strlen(b64_encrypted_key->valuestring));
+	size_t b64_encrypted_key_len = strlen(b64_encrypted_key->valuestring);
+	safe_strcpy(*b64_key, b64_encrypted_key->valuestring, b64_encrypted_key_len);
 	free(json);
 
 	return 1;

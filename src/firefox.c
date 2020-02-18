@@ -39,7 +39,7 @@ int get_firefox_creds(char *profile_path, char *logins_path, const char *output_
 
 	logins_array = cJSON_GetObjectItemCaseSensitive(values, "logins");	
 
-	FILE *output_fd;
+	FILE *output_fd = NULL;
 	if(output_file != NULL) {
 		output_fd = fopen(output_file, "ab");
 	}
@@ -86,7 +86,7 @@ int get_firefox_creds(char *profile_path, char *logins_path, const char *output_
  *
  * @return 1 on success, -1 on failure 
  */
-int dump_firefox(int verbose, const char *output_file, const char *master_password) {
+int dump_firefox(const char *output_file, const char *master_password) {
 	log_info("Starting Firefox dump ...\n");
 
 	int result = 0;

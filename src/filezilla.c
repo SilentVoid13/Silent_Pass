@@ -6,7 +6,7 @@
 #include "base64.h"
 #include "functions.h"
 
-int parse_sitemanager_xml(int verbose, const char *output_file, const char *master_password, char *path) {
+int parse_sitemanager_xml(const char *output_file, const char *master_password, char *path) {
 	xmlDocPtr doc;
 	xmlNodePtr cur;
 
@@ -37,7 +37,7 @@ int parse_sitemanager_xml(int verbose, const char *output_file, const char *mast
 	return 1;
 }
 
-int parse_recentservers_xml(int verbose, const char *output_file, const char *master_password, char *path) {
+int parse_recentservers_xml(const char *output_file, const char *master_password, char *path) {
 	xmlDocPtr doc;
 	xmlNodePtr cur;
 
@@ -69,6 +69,9 @@ int parse_recentservers_xml(int verbose, const char *output_file, const char *ma
 }
 
 int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, const char *master_password) {
+    // For warning
+    (void) master_password;
+
 	xmlChar *key;
 	char *host = NULL;
 	char *username = NULL;
@@ -79,27 +82,28 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, c
 	while(cur != NULL) {
 		if (cur->type == XML_ELEMENT_NODE) {
 			key = xmlNodeListGetString(doc, cur->xmlChildrenNode, 1);
+			size_t key_len = strlen(key);
 			if(strcmp(cur->name, "User") == 0) {
-				username = malloc(strlen(key)+1);
-				safe_strcpy(username, key, strlen(key));
+				username = malloc(key_len+1);
+				safe_strcpy(username, key, key_len);
 			}
 			else if(strcmp(cur->name, "Pass") == 0) {
-				cipher_password = malloc(strlen(key)+1);
-				safe_strcpy(cipher_password, key, strlen(key));
+				cipher_password = malloc(key_len+1);
+				safe_strcpy(cipher_password, key, key_len);
 			}
 			else if(strcmp(cur->name, "Host") == 0) {
-				host = malloc(strlen(key)+1);
-				safe_strcpy(host, key, strlen(key));
+				host = malloc(key_len+1);
+				safe_strcpy(host, key, key_len);
 			}
 			else if(strcmp(cur->name, "Port") == 0) {
-				safe_strcpy(port, key, strlen(key));
+				safe_strcpy(port, key, key_len);
 			}
 		}
 		cur = cur->next;
 	}
 
 	if(cipher_password != NULL) {
-		int len_cipher_password = strlen(cipher_password);
+		int len_cipher_password = (int)strlen(cipher_password);
 		if(base64_decode(cipher_password, &plaintext_password, &len_cipher_password) == -1) {
 			free(username);
 			free(cipher_password);
@@ -140,7 +144,7 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, c
 	return 1;
 }
 
-int dump_filezilla(int verbose, const char *output_file, const char *master_password) {
+int dump_filezilla(const char *output_file, const char *master_password) {
 	log_info("Starting FileZilla dump ...");
 
 	char filezilla_sitemanager_path[MAX_PATH_SIZE];
@@ -151,11 +155,11 @@ int dump_filezilla(int verbose, const char *output_file, const char *master_pass
 	int result = 0;
 
 	if(access(filezilla_sitemanager_path, 0) != -1) {
-		result = parse_sitemanager_xml(verbose, output_file, master_password, filezilla_sitemanager_path);
+		result = parse_sitemanager_xml(output_file, master_password, filezilla_sitemanager_path);
 	}
 
 	if(access(filezilla_sitemanager_path, 0) != -1) {
-		result = parse_recentservers_xml(verbose, output_file, master_password, filezilla_recentservers_path);
+		result = parse_recentservers_xml(output_file, master_password, filezilla_recentservers_path);
 	}
 
 	if(result == 0) {

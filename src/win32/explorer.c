@@ -1,3 +1,5 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "hicpp-signed-bitwise"
 #include "explorer.h"
 #include "specific_win.h"
 #include "specific.h"
@@ -76,7 +78,7 @@ int get_registry_history(IEUrl *urls, int *n_urls, int nHowMany) {
 					urls[nURL+added_urls].url[dwLength] = '\0';
 
 					// 1 wide char = 2 bytes
-					int utf_length = dwLength*2;
+					int utf_length = (int)dwLength*2;
 					mbstowcs(urls[nURL+added_urls].utf_url, szURL, dwLength);
 					urls[nURL+added_urls].url[utf_length] = '\0';
 				}
@@ -186,9 +188,10 @@ int get_ie_registry_creds(const char *output_file) {
 				char cipher_data[len_cipher_data];
 				if(RegQueryValueEx(hKey, reg_hash, 0, &size, cipher_data, (long unsigned int *)&len_cipher_data) != ERROR_SUCCESS) {
 					log_error("RegQueryValueEx() failure");
-				};
+				}
 
-				if(dpapi_decrypt_entropy(cipher_data, len_cipher_data, urls[j].utf_url, (wcslen(urls[j].utf_url)+1)*2, &decrypted_data) == -1) {
+				size_t url_length = (wcslen(urls[j].utf_url)+1)*2;
+				if(dpapi_decrypt_entropy(cipher_data, len_cipher_data, urls[j].utf_url, url_length, &decrypted_data) == -1) {
 					log_error("dpapi_decrypt() failure");
 				}
 				print_decrypted_data(decrypted_data, urls[j].url, output_file);
@@ -216,7 +219,7 @@ int print_decrypted_data(char *decrypted_data, char *url, const char *output_fil
 	memcpy(&DataMax,&decrypted_data[20],4);
 	//printf("HeaderSize=%d DataMax=%d\n",HeaderSize,DataMax);
 
-	FILE *output_fd;
+	FILE *output_fd = NULL;
 	if(output_file != NULL) {
 		output_fd = fopen(output_file, "ab");
 	}
@@ -306,7 +309,7 @@ int get_ie_vault_creds(const char *output_file) {
 		return -1;
 	}
 
-	FILE *output_fd;
+	FILE *output_fd = NULL;
 	if(output_file != NULL) {
 		output_fd = fopen(output_file, "ab");
 	}
@@ -363,7 +366,7 @@ int get_ie_vault_creds(const char *output_file) {
  *
  * @return 1 on success, -1 on failure 
  */
-int dump_explorer(int verbose, const char *output_file) {
+int dump_explorer(const char *output_file) {
 	log_info("Starting IE10 / MSEdge dump...\n");
 	if(get_ie_vault_creds(output_file) == -1) {
 		log_error("get_ie_vault_creds() failure");
@@ -376,3 +379,5 @@ int dump_explorer(int verbose, const char *output_file) {
 	
 	return 1;
 }
+
+#pragma clang diagnostic pop

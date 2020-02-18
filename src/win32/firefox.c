@@ -23,11 +23,11 @@ HMODULE moduleNSS;
  * @return 1 on success, -1 on failure
  */
 int load_firefox_libs() {
-        char pathFirefox[MAX_PATH_SIZE];
-        char pathDll[MAX_PATH_SIZE];
-        char new_path[MAX_PATH_SIZE];
-        SHGetSpecialFolderPath(0, pathFirefox, CSIDL_PROGRAM_FILES, FALSE);
-        strcat(pathFirefox, "\\Mozilla Firefox");
+    char pathFirefox[MAX_PATH_SIZE];
+    char pathDll[MAX_PATH_SIZE];
+    char new_path[MAX_PATH_SIZE];
+    SHGetSpecialFolderPath(0, pathFirefox, CSIDL_PROGRAM_FILES, FALSE);
+    strcat(pathFirefox, "\\Mozilla Firefox");
 
 	// We set our ENV PATH to load all libary dependencies.
 	char *path = getenv("PATH");
@@ -35,23 +35,23 @@ int load_firefox_libs() {
 		snprintf(new_path, MAX_PATH_SIZE, "PATH=%s;%s", path, pathFirefox);
 		_putenv(new_path);
 	}
-	path=getenv("PATH");
 
-        snprintf(pathDll, MAX_PATH_SIZE, "%s\\%s", pathFirefox, "nss3.dll");
-        if(!(moduleNSS = LoadLibrary(pathDll))) {
-		log_error("nss3.dll Loading failure");
-                return -1;
+    snprintf(pathDll, MAX_PATH_SIZE, "%s\\%s", pathFirefox, "nss3.dll");
+
+    if(!(moduleNSS = LoadLibrary(pathDll))) {
+        log_error("nss3.dll Loading failure");
+        return -1;
 	}
  
-        NSS_Init = (NSSInit)GetProcAddress(moduleNSS, "NSS_Init");
-        PK11_GetInternalKeySlot = (PK11GetInternalKeySlot)GetProcAddress(moduleNSS, "PK11_GetInternalKeySlot");
-        PK11_Authenticate = (PK11Authenticate)GetProcAddress(moduleNSS, "PK11_Authenticate");
-        PK11SDR_Decrypt = (PK11SDRDecrypt)GetProcAddress(moduleNSS, "PK11SDR_Decrypt");
-        //NSSBase64_DecodeBuffer = (NSSBase64DecodeBuffer)GetProcAddress(moduleNSS, "NSSBase64_DecodeBuffer");
+    NSS_Init = (NSSInit)GetProcAddress(moduleNSS, "NSS_Init");
+    PK11_GetInternalKeySlot = (PK11GetInternalKeySlot)GetProcAddress(moduleNSS, "PK11_GetInternalKeySlot");
+    PK11_Authenticate = (PK11Authenticate)GetProcAddress(moduleNSS, "PK11_Authenticate");
+    PK11SDR_Decrypt = (PK11SDRDecrypt)GetProcAddress(moduleNSS, "PK11SDR_Decrypt");
+    //NSSBase64_DecodeBuffer = (NSSBase64DecodeBuffer)GetProcAddress(moduleNSS, "NSSBase64_DecodeBuffer");
 	PL_Base64Decode = (fpPL_Base64Decode)GetProcAddress(moduleNSS, "PL_Base64Decode");
-        PK11_CheckUserPassword = (PK11CheckUserPassword)GetProcAddress(moduleNSS, "PK11_CheckUserPassword");
-        NSS_Shutdown = (NSSShutdown)GetProcAddress(moduleNSS, "NSS_Shutdown");
-        PK11_FreeSlot = (PK11FreeSlot)GetProcAddress(moduleNSS, "PK11_FreeSlot");
+    PK11_CheckUserPassword = (PK11CheckUserPassword)GetProcAddress(moduleNSS, "PK11_CheckUserPassword");
+    NSS_Shutdown = (NSSShutdown)GetProcAddress(moduleNSS, "NSS_Shutdown");
+    PK11_FreeSlot = (PK11FreeSlot)GetProcAddress(moduleNSS, "PK11_FreeSlot");
 
 	// Added
 	//SECItem_FreeItem = (SECItemFreeItem)GetProcAddress(moduleNSS, "SECItem_FreeItem");
@@ -62,7 +62,7 @@ int load_firefox_libs() {
 		return -1;
 	}
 
-        return 1;
+    return 1;
 }
 
 /**
@@ -123,7 +123,8 @@ int decrypt_firefox_cipher(char *ciphered, char **plaintext) {
 	//response = SECITEM_AllocItem(NULL, NULL, 0);
 	//request = NSSBase64_DecodeBuffer(NULL, NULL, ciphered, len);
 
-	if(PL_Base64Decode(ciphered, strlen(ciphered), decoded_cipher) == 0) {
+	size_t ciphered_len = strlen(ciphered);
+	if(PL_Base64Decode(ciphered, ciphered_len, decoded_cipher) == 0) {
 		log_error("PL_Base64Decode() failure");
 		free(request.data);
 		return -1;
@@ -172,7 +173,7 @@ int nss_authenticate(char *profile_path, void *key_slot, const char *master_pass
 	}
 
 	if(master_password != NULL) {
-		if(PK11_CheckUserPassword(key_slot, master_password) != SECSuccess) {
+		if(PK11_CheckUserPassword(key_slot, (char *)master_password) != SECSuccess) {
 			log_error("PK11_CheckUserPassword() failed, Wrong master password");
 			fflush(stderr);
 			return -1;

@@ -20,7 +20,7 @@ int get_profile(char* profiles_ini_path, char* profile) {
 	}
 	
 	const char* s = iniparser_getstring(ini, "Profile0:Path", NULL);
-	int length = strlen(s);
+	size_t length = strlen(s);
 	strncpy(profile, s, length+1);
 
 	// Free all memory associated to the dictionary
@@ -119,6 +119,6 @@ int nss_authenticate(char *profile_path, void *key_slot, const char *master_pass
  * @return 
  */
 void free_pk11_nss(void *key_slot) {
-	PK11_FreeSlot(&key_slot);
+	PK11_FreeSlot(key_slot);
 	NSS_Shutdown();
 }

@@ -7,6 +7,7 @@
 - [ ] Add Opera support
 - [ ] Add Brave Browser support
 - [ ] Refactor functions (parameter names, ...)
+- [ ] Add verbose management
 - [x] Make clean Makefile (use cmake ?)
 - [x] Create the README file
 - [x] Add Code Documentation
@@ -48,6 +49,7 @@
 - [ ] Add functions to query full IE history (For IE7-IE9)
 - [ ] Add IE11 Support (same as IE10 ?)
 - [ ] Add IE6- Support ?
+- [ ] Full clean code (really messy right now)
 - [x] Add IE7-IE9 Support
 - [x] Test Vault for Windows 7
 

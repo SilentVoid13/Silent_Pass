@@ -5,7 +5,7 @@
 #include "log.h"
 #include "functions.h"
 
-const SecretSchema * get_chrome_like_schema (void) G_GNUC_CONST;
+//const SecretSchema * get_chrome_like_schema (void) G_GNUC_CONST;
 #define CHROME_LIKE_SCHEMA  get_chrome_like_schema ()
 
 /**
@@ -145,7 +145,9 @@ int decrypt_gnome_cipher(char *cipher_password, int len_cipher_password, char **
 	// 2 - We get the PBKDF2 key 
 	unsigned char output_key[KEY_LENGTH];
 	char *salt = "saltysalt";
-	if(PKCS5_PBKDF2_HMAC(masterkey, strlen(masterkey), salt, strlen(salt), 1, EVP_sha1(), KEY_LENGTH, output_key) == 0) {
+	size_t masterkey_len = strlen(masterkey);
+	size_t salt_len = strlen(salt);
+	if(PKCS5_PBKDF2_HMAC(masterkey, masterkey_len, salt, salt_len, 1, EVP_sha1(), KEY_LENGTH, output_key) == 0) {
 		log_error("PKCS5_PBKDF2_HMAC() failure");
 		return -1;
 	}

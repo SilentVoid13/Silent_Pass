@@ -36,8 +36,9 @@ int base64_decode(char* b64message, char** buffer, int* length) {
 	b64 = BIO_new(BIO_f_base64());
 	bio = BIO_push(b64, bio);
 
-	BIO_set_flags(bio, BIO_FLAGS_BASE64_NO_NL); 
-	*length = BIO_read(bio, *buffer, strlen(b64message));
+	BIO_set_flags(bio, BIO_FLAGS_BASE64_NO_NL);
+	size_t b64_len = strlen(b64message);
+	*length = BIO_read(bio, *buffer, b64_len);
 	if(*length != decodeLen) {
 		free(*buffer);
 		log_error("Base64 decoding error");
@@ -54,12 +55,14 @@ int base64_decode(char* b64message, char** buffer, int* length) {
  * @return plaintext size
  */
 int calc_base64_length(const char* b64input) {
-	size_t len = strlen(b64input),padding = 0;
+	size_t len = strlen(b64input);
+	int padding = 0;
 
 	if (b64input[len-1] == '=' && b64input[len-2] == '=') 
 		padding = 2;
 	else if (b64input[len-1] == '=')
 		padding = 1;
 
-	return (len*3)/4 - padding;
+	int int_len = (int) len;
+	return (int_len*3)/4 - padding;
 }

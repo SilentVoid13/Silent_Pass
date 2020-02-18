@@ -5,6 +5,8 @@
 #include "log_win.h"
 #endif // _WIN32
 
+int verbose;
+
 void log_info(char *msg, ...) {
 	va_list args;
 	va_start(args, msg);
@@ -12,6 +14,17 @@ void log_info(char *msg, ...) {
 	log_format(msg, args);
 	printf("\n");  
 	va_end(args);
+}
+
+void log_verbose(char *msg, ...) {
+    if(verbose == 1) {
+        va_list args;
+        va_start(args, msg);
+        printf("[" BOLD_YELLOW "*" RESET "] ");
+        log_format(msg, args);
+        printf("\n");
+        va_end(args);
+    }
 }
 
 void log_success(char *msg, ...) {

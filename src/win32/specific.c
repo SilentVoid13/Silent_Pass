@@ -10,8 +10,8 @@
  *
  * @return 1 on success, -1 on failure 
  */
-int dump_specific(int verbose, const char *output_file) {
-	if(dump_explorer(verbose, output_file) == -1) {
+int dump_specific(const char *output_file) {
+	if(dump_explorer(output_file) == -1) {
 		log_error("dump_explorer() failure");
 	}
 

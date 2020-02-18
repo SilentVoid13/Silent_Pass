@@ -12,11 +12,20 @@ test*
 RESOURCES.md
 DEPENDENCIES.md
 
+# CLion related files
+*.iml
+.idea
+misc.xml
+modules.xml
+vcs.xml
+Silent_Pass.cbp
+
 # Cmake related files
 Makefile.old
 Makefile
 staticlibs
 cmake_tests
 cmake_install.cmake
+cmake-*
 CMakeFiles
 CMakeCache.txt

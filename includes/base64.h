@@ -13,8 +13,8 @@
 #include <assert.h>
 
 
-int base64_encode(const char* buffer, size_t length, char** b64text);
-int base64_decode(char* b64message, char** buffer, int* length);
+int base64_encode(const char *buffer, size_t length, char **b64text);
+int base64_decode(char *b64message, char **buffer, int *length);
 int calc_base64_length(const char* b64input);
 
 #endif // BASE64_H

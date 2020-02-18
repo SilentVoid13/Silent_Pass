@@ -8,7 +8,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/staticlibs)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/staticlibs)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-#set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} "-Wall -Wextra -Wno-pointer-sign")
+set(CMAKE_C_FLAGS "-Wall")
+set(CMAKE_C_FLAGS "-Wextra")
+set(CMAKE_C_FLAGS "-Wno-pointer-sign")
 
 ### Includes ### 
 
