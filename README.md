@@ -20,6 +20,8 @@ Silent_Pass currently support the following softwares :
 - Chromium
 - FileZilla
 
+You can suggest me a software you want me to add.
+
 ## Usage
 
 ```bash
