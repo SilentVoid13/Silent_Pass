@@ -2,16 +2,24 @@
 #include "firefox.h"
 #include "chrome.h"
 #include "filezilla.h"
+#include "git.h"
 #include "specific.h"
 
 #include "log.h"
 
-struct arg_lit *verb, *help, *version, *all, *firefox, *chrome, *specific, *filezilla;
+struct arg_lit *verb, *help, *version, *all, *firefox, *chrome, *specific, *filezilla, *git;
 struct arg_str *master_firefox, *master_filezilla;
 struct arg_file *output;
 struct arg_end *end;
 
 int verbose;
+
+void display_argtable_help(char *progname, void **argtable) {
+    printf("Usage: %s", progname);
+    arg_print_syntax(stdout, argtable, "\n");
+    arg_print_glossary(stdout, argtable, "  %-25s %s\n");
+    exit(0);
+}
 
 /** 
  * Main function that parse the args and calls the different sub_functions
@@ -26,8 +34,9 @@ int main(int argc, char** argv) {
 		all      = arg_litn("a", "all", 0, 1, "Harvest all softwares credentials"),
 		firefox  = arg_litn("f", "firefox", 0, 1, "Harvest Firefox credentials"),
 		chrome   = arg_litn("c", "chrome", 0, 1, "Harvest Chrome-like credentials"),
-		specific = arg_litn("s", "specific", 0, 1, "Harvest OS Specific browsers credentials (e.g: IE for Windows)"),
+		specific = arg_litn("s", "specific", 0, 1, "Harvest OS Specific softwares credentials (currently: IE / MSEdge for Windows)"),
 		filezilla = arg_litn("F", "filezilla", 0, 1, "Harvest FileZilla credentials"),
+		git = arg_litn("g", "git", 0, 1, "Harvest Git credentials"),
 		master_firefox   = arg_strn(NULL, "master-firefox", "password", 0, 1, "Master password to decrypt passwords for Firefox"),
 		master_filezilla = arg_strn(NULL, "master-filezilla", "password", 0, 1, "Master password to decrypt passwords for FileZilla"),
 		output   = arg_filen("o", "output", "filename", 0, 1, "Output file"),
@@ -47,10 +56,7 @@ int main(int argc, char** argv) {
 	nerrors = arg_parse(argc, argv, argtable);
 
 	if(help->count > 0) {
-		printf("Usage: %s", progname);
-		arg_print_syntax(stdout, argtable, "\n");
-		arg_print_glossary(stdout, argtable, "  %-25s %s\n");
-		exit(0);
+	    display_argtable_help(progname, argtable);
 	}
 	
 	if(version->count > 0) {
@@ -87,6 +93,9 @@ int main(int argc, char** argv) {
 		if(dump_filezilla(output->filename[0], master_filezilla->sval[0]) == -1) {
 			log_error("dump_filezilla() failure");
 		}
+		if(dump_git(output->filename[0]) == -1) {
+		    log_error("dump_git() failure");
+		}
 	}
 	else if (chrome->count > 0) {
 		log_info("Chrome mode\n");
@@ -113,11 +122,14 @@ int main(int argc, char** argv) {
 			log_error("dump_filezilla() failure");
 		}
 	}
+	else if (git->count > 0) {
+	    log_info("Git mode\n");
+	    if(dump_git(output->filename[0]) == -1) {
+	        log_error("dump_git() failure");
+	    }
+	}
 	else {
-		printf("Usage: %s", progname);
-		arg_print_syntax(stdout, argtable, "\n");
-		arg_print_glossary(stdout, argtable, "  %-25s %s\n");
-		exit(0);
+	    display_argtable_help(progname, argtable);
 	}
 
 	arg_freetable(argtable, sizeof(argtable) / sizeof(argtable[0]));

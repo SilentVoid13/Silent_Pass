@@ -4,6 +4,8 @@
 - [x] Add Linux 32 bit support
 - [ ] Add MAC OSX Support
 - [x] Add FileZilla support
+- [x] Add Git support
+- [ ] Add Windows Credentials Vault support
 - [ ] Add Opera support
 - [ ] Add Brave Browser support
 - [ ] Refactor functions (parameter names, ...)
@@ -59,3 +61,5 @@
 - [x] Add output file support
 - [x] Add MinGW libxml support (for Windows)
 - [x] Add error checks
+
+## For Git

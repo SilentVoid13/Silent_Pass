@@ -6,7 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "cJSON.h"
+#include "lib/cJSON/cJSON.h"
 
 int dump_firefox(const char *output_file, const char *master_password);
 int get_firefox_creds(char *profile_path, char *logins_path, const char *output_file, const char *master_password); 

@@ -8,28 +8,46 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/staticlibs)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/staticlibs)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-set(CMAKE_C_FLAGS "-Wall")
-set(CMAKE_C_FLAGS "-Wextra")
-set(CMAKE_C_FLAGS "-Wno-pointer-sign")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-pointer-sign")
+
+### Git Submodule management ###
+find_package(Git REQUIRED)
+if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+	option(GIT_SUBMODULE "Check submodules during build" ON)
+	if(GIT_SUBMODULE)
+		message(STATUS "Submodule update")
+		execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+				WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+				RESULT_VARIABLE GIT_SUBMOD_RESULT)
+		if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+			message(FATAL_ERROR "git submodule update --init failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
+		endif()
+	endif()
+endif()
+
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/src/utilities/Silent_Log/log.c")
+	message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
+endif()
 
 ### Includes ### 
 
-include_directories(includes includes/nss includes/nspr)
-
+include_directories(includes includes/linux includes/utilities includes/win32 includes/lib includes/lib/argtable3 includes/lib/iniparser includes/lib/libyuarel includes/lib/cJSON includes/lib/sqlite3 includes/lib/nss includes/lib/nspr src/utilities/Silent_Log)
 
 ### Sources ###
 
-set(SOURCES src/chrome.c src/firefox.c src/filezilla.c src/main.c)
-set(SOURCES ${SOURCES} src/utilities/functions.c src/utilities/json.c src/utilities/base64.c src/utilities/xml.c src/utilities/log/log.c)
+set(SOURCES src/chrome.c src/firefox.c src/filezilla.c src/main.c src/git.c)
+
+set(UTILITIES_SOURCES src/utilities/functions.c src/utilities/json.c src/utilities/base64.c src/utilities/xml.c src/utilities/Silent_Log/log.c)
+set(SOURCES ${SOURCES} ${UTILITIES_SOURCES})
 
 if(WIN32)
-	set(SOURCES ${SOURCES} src/win32/chrome.c src/win32/explorer.c src/win32/firefox.c src/win32/specific.c src/win32/filezilla.c)
-	set(SOURCES ${SOURCES} src/utilities/log/log_win.c)
+	set(SOURCES ${SOURCES} src/win32/chrome.c src/win32/explorer.c src/win32/firefox.c src/win32/specific.c src/win32/filezilla.c src/win32/git.c)
 endif(WIN32)
 
 if(UNIX)
-	set(SOURCES ${SOURCES} src/linux/chrome.c src/linux/firefox.c src/linux/specific.c src/linux/filezilla.c)
-	set(SOURCES ${SOURCES} src/utilities/log/log_linux.c)
+	set(SOURCES ${SOURCES} src/linux/chrome.c src/linux/firefox.c src/linux/specific.c src/linux/filezilla.c src/linux/git.c)
 endif(UNIX)
 
 add_executable(Silent_Pass ${SOURCES})
@@ -52,7 +70,11 @@ set(SQLITE3_SOURCES "lib/src/sqlite3.c")
 add_library(sqlite3 STATIC ${SQLITE3_SOURCES})
 #install(TARGETS sqlite3 DESTINATION staticlibs)
 
-target_link_libraries(Silent_Pass cjson sqlite3 argtable3)
+set(YUAREL_SOURCES "lib/src/yuarel.c")
+add_library(yuarel STATIC ${YUAREL_SOURCES})
+#install(TARGETS yuarel DESTINATION staticlibs)
+
+target_link_libraries(Silent_Pass cjson sqlite3 argtable3 yuarel)
 
 
 ### Other libs ###

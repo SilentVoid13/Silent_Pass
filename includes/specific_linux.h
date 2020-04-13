@@ -1,5 +1,0 @@
-#ifndef SPECIFIC_LINUX_H
-#define SPECIFIC_LINUX_H
-
-
-#endif // SPECIFIC_LINUX_H

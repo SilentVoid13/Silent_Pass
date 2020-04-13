@@ -19,24 +19,25 @@ Silent_Pass currently support the following softwares :
 - Internet Explorer / Microsoft Edge
 - Chromium
 - FileZilla
+- Git
 
 You can suggest me a software you want me to add.
 
 ## Usage
 
 ```bash
-Usage: Silent_Pass [-hVvafcsF] [--master-firefox=password] [--master-filezilla=password] [-o filename]
+Usage: Silent_Pass [-hVvafcsFg] [--master-firefox=password] [--master-filezilla=password] [-o filename]
   -h, --help                Display this help and exit
   -V, --version             Display version info and exit
   -v, --verbose             Verbose output
   -a, --all                 Harvest all softwares credentials
   -f, --firefox             Harvest Firefox credentials
   -c, --chrome              Harvest Chrome-like credentials
-  -s, --specific            Harvest OS Specific browsers credentials (e.g: IE for Windows)
+  -s, --specific            Harvest OS Specific softwares credentials (currently: IE / MSEdge for Windows)
   -F, --filezilla           Harvest FileZilla credentials
+  -g, --git                 Harvest Git credentials
   --master-firefox=password Master password to decrypt passwords for Firefox
   --master-filezilla=password Master password to decrypt passwords for FileZilla
-  -o, --output=filename     Output file
 ```
 
 Master Password option can only be used with Firefox (currently not working on FileZilla).
@@ -112,6 +113,7 @@ Currently, Silent_Pass relies on the following dependencies :
 - cJSON
 - zlib
 - libxml2
+- libyuarel
 
 ## Known bugs
 

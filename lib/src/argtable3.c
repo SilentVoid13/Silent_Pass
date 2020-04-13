@@ -28,7 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "argtable3.h"
+#include "lib/argtable3/argtable3.h"
 
 #define ARG_AMALGAMATION
 
@@ -294,7 +294,7 @@ int arg_hashtable_itr_search(arg_hashtable_itr_t* itr, arg_hashtable_t* h, void*
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "argtable3.h"
+#include "lib/argtable3/argtable3.h"
 
 #ifndef ARG_AMALGAMATION
 #include "argtable3_private.h"
@@ -894,7 +894,7 @@ int arg_hashtable_change(arg_hashtable_t* h, void* k, void* v) {
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "argtable3.h"
+#include "lib/argtable3/argtable3.h"
 
 #ifndef ARG_AMALGAMATION
 #include "argtable3_private.h"
@@ -1341,7 +1341,7 @@ extern char* suboptarg; /* getsubopt(3) external variable */
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "argtable3.h"
+#include "lib/argtable3/argtable3.h"
 
 #ifndef ARG_AMALGAMATION
 #include "getopt.h"
@@ -1846,7 +1846,7 @@ int getopt_long_only(int nargc, char* const* nargv, const char* options, const s
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "argtable3.h"
+#include "lib/argtable3/argtable3.h"
 
 #ifndef ARG_AMALGAMATION
 #include "argtable3_private.h"
@@ -2416,7 +2416,7 @@ static int conv_num(const char** buf, int* dest, int llim, int ulim) {
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "argtable3.h"
+#include "lib/argtable3/argtable3.h"
 
 #ifndef ARG_AMALGAMATION
 #include "argtable3_private.h"
@@ -2576,7 +2576,7 @@ struct arg_dbl* arg_dbln(const char* shortopts, const char* longopts, const char
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "argtable3.h"
+#include "lib/argtable3/argtable3.h"
 
 #ifndef ARG_AMALGAMATION
 #include "argtable3_private.h"
@@ -2705,7 +2705,7 @@ void arg_print_errors(FILE* fp, struct arg_end* end, const char* progname) {
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "argtable3.h"
+#include "lib/argtable3/argtable3.h"
 
 #ifndef ARG_AMALGAMATION
 #include "argtable3_private.h"
@@ -2914,7 +2914,7 @@ struct arg_file* arg_filen(const char* shortopts, const char* longopts, const ch
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "argtable3.h"
+#include "lib/argtable3/argtable3.h"
 
 #ifndef ARG_AMALGAMATION
 #include "argtable3_private.h"
@@ -3203,7 +3203,7 @@ struct arg_int* arg_intn(const char* shortopts, const char* longopts, const char
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "argtable3.h"
+#include "lib/argtable3/argtable3.h"
 
 #ifndef ARG_AMALGAMATION
 #include "argtable3_private.h"
@@ -3322,7 +3322,7 @@ struct arg_lit* arg_litn(const char* shortopts, const char* longopts, int mincou
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "argtable3.h"
+#include "lib/argtable3/argtable3.h"
 
 #ifndef ARG_AMALGAMATION
 #include "argtable3_private.h"
@@ -3381,7 +3381,7 @@ struct arg_rem* arg_rem(const char* datatype, const char* glossary) {
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "argtable3.h"
+#include "lib/argtable3/argtable3.h"
 
 #ifndef ARG_AMALGAMATION
 #include "argtable3_private.h"
@@ -4382,7 +4382,7 @@ TRexBool trex_getsubexp(TRex* exp, int n, TRexMatch* subexp) {
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "argtable3.h"
+#include "lib/argtable3/argtable3.h"
 
 #ifndef ARG_AMALGAMATION
 #include "argtable3_private.h"
@@ -4524,7 +4524,7 @@ struct arg_str* arg_strn(const char* shortopts, const char* longopts, const char
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "argtable3.h"
+#include "lib/argtable3/argtable3.h"
 
 #ifndef ARG_AMALGAMATION
 #include "argtable3_private.h"
@@ -4798,7 +4798,7 @@ int arg_make_syntax_err_help_msg(arg_dstr_t ds, char* name, int help, int nerror
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "argtable3.h"
+#include "lib/argtable3/argtable3.h"
 
 #ifndef ARG_AMALGAMATION
 #include "argtable3_private.h"

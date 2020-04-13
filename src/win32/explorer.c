@@ -142,7 +142,7 @@ int get_ie_history() {
  */
 void add_known_websites(IEUrl *urls, int *n_urls) {
 	// https://stackoverflow.com/questions/4832082/c-double-character-pointer-declaration-and-initialization
-	unsigned char *known_websites[] = {"https://www.facebook.com/", "http://www.facebook.com", "https://facebook.com/", "https://www.gmail.com/", "https://accounts.google.com/", "https://accounts.google.com/servicelogin"};
+	unsigned char *known_websites[] = {"https://www.facebook.com/", "https://m.facebook.com/", "https://www.gmail.com/", "https://accounts.google.com/", "https://accounts.google.com/servicelogin"};
 	int total_size = sizeof(known_websites) / sizeof(*known_websites);
 	for(int i = 0; i < total_size; i++) {
 		memcpy(urls[i].url, known_websites[i], strlen(known_websites[i]));
