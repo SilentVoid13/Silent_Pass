@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "lib/argtable3/argtable3.h"
+#include "argtable3.h"
 
 #define MAX_PATH_SIZE 300
 

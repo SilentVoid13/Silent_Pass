@@ -13,7 +13,7 @@
 /*---------------------------------------------------------------------------
                                 Includes
  ---------------------------------------------------------------------------*/
-#include "lib/iniparser/dictionary.h"
+#include "dictionary.h"
 
 #include <stdio.h>
 #include <stdlib.h>

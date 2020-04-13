@@ -9,7 +9,7 @@
 /*---------------------------- Includes ------------------------------------*/
 #include <ctype.h>
 #include <stdarg.h>
-#include "lib/iniparser/iniparser.h"
+#include "iniparser.h"
 
 /*---------------------------- Defines -------------------------------------*/
 #define ASCIILINESZ         (1024)

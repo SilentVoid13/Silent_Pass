@@ -12,7 +12,7 @@
 #include <openssl/kdf.h>
 #include <openssl/bio.h>
 
-#include "lib/cJSON/cJSON.h"
+#include "cJSON.h"
 
 int dpapi_decrypt(char *cipher_password, int len_cipher_password, char **plaintext_password);
 int aead_decrypt(char *cipher_password, int len_cipher_password, char *key, char *iv, int len_iv, char **plaintext_password);
