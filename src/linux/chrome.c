@@ -2,8 +2,10 @@
 #include "chrome_linux.h"
 #include "main.h"
 
-#include "log.h"
 #include "functions.h"
+#include "log.h"
+#include "s_aes.h"
+#include "s_pbkdf.h"
 
 //const SecretSchema * get_chrome_like_schema (void) G_GNUC_CONST;
 #define CHROME_LIKE_SCHEMA  get_chrome_like_schema ()
@@ -66,61 +68,6 @@ int get_gnome_masterkey(char *login_data_path, char **masterkey) {
 	}
 }
 
-/** 
- * AES decrypt the cipher_password with the IV and the key
- * 
- * @return 1 on success, -1 on failure
- */
-int aes_decrypt(EVP_CIPHER_CTX *ctx, char *cipher_password, int len_cipher_password, char **plaintext_password, char *iv, unsigned char *output_key) {
-	int len;
-	int plaintext_len;
-	
-	// We don't need the 3 first bytes (V10 or V11)
-	char *good_cipher_password = &cipher_password[3];
-	int len_good_cipher = len_cipher_password - 3;
-
-	// The ciphertext is always greater or equal to the length of the plaintext
-	*plaintext_password = (unsigned char *)malloc(len_good_cipher);
-	if(*plaintext_password == 0) {
-		log_error("malloc() failure");
-		free(*plaintext_password);
-		return -1;
-	}
-
-	log_verbose("Cipher text length: %d\n", len_good_cipher);
-
-	if(!(ctx = EVP_CIPHER_CTX_new())) {
-		log_error("EVP_CIPHER_CTX_new() failure");
-		return -1;
-	}
-	if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, output_key, iv)) {
-		log_error("EVP_DecryptInit_ex() failure");
-		ERR_print_errors_fp(stderr);
-		return -1;
-	}
-	
-	// Disabling padding is actually useless we already have a valid ciphertext length
-	//EVP_CIPHER_CTX_set_padding(ctx, 0);
-
-	if(1 != EVP_DecryptUpdate(ctx, *plaintext_password, &len, good_cipher_password, len_good_cipher)) {
-		log_error("EVP_DecryptUpdate() failure");
-		ERR_print_errors_fp(stderr);
-		return -1;
-	}
-	plaintext_len = len;
-
-	if(1 != EVP_DecryptFinal_ex(ctx, *plaintext_password+len, &len)) {
-		log_error("EVP_DecryptFinal_ex() failure");
-		ERR_print_errors_fp(stderr);
-		return -1;
-	}
-	plaintext_len += len;
-	(*plaintext_password)[plaintext_len] = '\0';
-	EVP_CIPHER_CTX_free(ctx);
-
-	return 1;
-}
-
 /**
  * Get the masterkey for the storage system in use
  *
@@ -145,11 +92,13 @@ int decrypt_gnome_cipher(char *cipher_password, int len_cipher_password, char **
 	// 2 - We get the PBKDF2 key 
 	unsigned char output_key[KEY_LENGTH];
 	char *salt = "saltysalt";
+    char *iv = "                ";
 	size_t masterkey_len = strlen(masterkey);
 	size_t salt_len = strlen(salt);
-	if(PKCS5_PBKDF2_HMAC(masterkey, masterkey_len, salt, salt_len, 1, EVP_sha1(), KEY_LENGTH, output_key) == 0) {
-		log_error("PKCS5_PBKDF2_HMAC() failure");
-		return -1;
+
+	if(pbkdf2_hmac_derive(masterkey, masterkey_len, salt, salt_len, 1, "sha1", output_key, KEY_LENGTH) == -1) {
+	    log_error("pbkdf2_hmac_derive() failure");
+	    return -1;
 	}
 
 	log_verbose("PBKDF2 key: ");
@@ -160,10 +109,11 @@ int decrypt_gnome_cipher(char *cipher_password, int len_cipher_password, char **
         printf("\n\n");
     }
 
-	EVP_CIPHER_CTX *ctx = NULL;
-	char *iv = "                ";
+    // We don't need the 3 first bytes (V10 or V11)
+    char *good_cipher_password = &cipher_password[3];
+    int good_cipher_len = len_cipher_password - 3;
 
-	if(aes_decrypt(ctx, cipher_password, len_cipher_password, plaintext_password, iv, output_key) == -1) {
+    if(aes_decrypt("aes_128_cbc", good_cipher_password, good_cipher_len, output_key, iv, (unsigned char **)plaintext_password) == -1) {
 		log_error("aes_decrypt() failure");
 		return -1;
 	}

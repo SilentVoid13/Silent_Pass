@@ -3,7 +3,7 @@
 
 #include "log.h"
 #include "xml.h"
-#include "base64.h"
+#include "s_base64.h"
 #include "functions.h"
 
 int parse_sitemanager_xml(const char *output_file, const char *master_password, char *path) {
@@ -78,7 +78,7 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, c
 	char *host = NULL;
 	char *username = NULL;
 	char *cipher_password = NULL;
-	char *plaintext_password = NULL;
+	unsigned char *plaintext_password = NULL;
 	char port[6] = {-1};
 
 	while(cur != NULL) {
@@ -109,8 +109,8 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, c
 	}
 
 	if(cipher_password != NULL) {
-		int len_cipher_password = (int)strlen(cipher_password);
-		if(base64_decode(cipher_password, &plaintext_password, &len_cipher_password) == -1) {
+		int cipher_password_len = (int)strlen(cipher_password);
+		if(base64_decode(cipher_password, cipher_password_len, &plaintext_password) == -1) {
 			free(username);
 			free(cipher_password);
 			free(host);

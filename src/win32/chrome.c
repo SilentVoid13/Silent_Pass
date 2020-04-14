@@ -3,7 +3,8 @@
 #include "main.h"
 
 #include "json.h"
-#include "base64.h"
+#include "s_base64.h"
+#include "s_aead.h"
 #include "functions.h"
 #include "log.h"
 
@@ -29,81 +30,6 @@ int dpapi_decrypt(char *cipher_password, int len_cipher_password, char **plainte
 	}
 	memcpy(*plaintext_password, decrypted_blob.pbData, decrypted_blob.cbData);
 	(*plaintext_password)[decrypted_blob.cbData] = '\0';
-
-	return 1;
-}
-
-/**
- * AEAD decrypting function (with no IV len)
- *
- * @return 1 on success, -1 on failure 
- */
-int aead_decrypt(char *cipher_password, int len_cipher_password, char *key, char *iv, int len_iv, char **plaintext_password) {
-	EVP_CIPHER_CTX *ctx;
-	int len;
-	int plaintext_len;
-    (void) len_iv;
-
-	// The tag is appended at the end of the cipher data
-	int tag_offset = len_cipher_password-16;
-
-	// Cipher_password len always greater or equal to plaintext
-	*plaintext_password = (unsigned char *)malloc(len_cipher_password);
-	if(*plaintext_password == 0) {
-		log_error("malloc() failure");
-		free(*plaintext_password);
-		return -1;
-	}
-
-	if(!(ctx = EVP_CIPHER_CTX_new())) {
-		log_error("EVP_CIPHER_CTX_new() failure");
-		ERR_print_errors_fp(stderr);
-		return -1;
-	}
-
-	if(!EVP_DecryptInit_ex(ctx, EVP_aes_256_gcm(), NULL, NULL, NULL)) {
-		log_error("EVP_DecryptInit_ex() failure");
-		ERR_print_errors_fp(stderr);
-		return -1;
-	}
-
-	if(!EVP_DecryptInit_ex(ctx, NULL, NULL, key, iv)) {
-		log_error("EVP_DecryptInit_ex() failure");
-		ERR_print_errors_fp(stderr);
-		return -1;
-	}
-
-	// Set the expected tag value for authenticated data
-	if(!EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, 16, cipher_password+tag_offset)) {
-		log_error("EVP_CIPHER_CTX_ctrl() failure");
-		ERR_print_errors_fp(stderr);
-		return -1;
-	}
-
-	/* Not useful since len_iv = 12
-	if(!EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN, len_iv, NULL)) {
-		log_error("EVP_CIPHER_CTX_ctrl() failure");
-		ERR_print_errors_fp(stderr);
-		return -1;
-	}	
-	*/
-
-	if(!EVP_DecryptUpdate(ctx, *plaintext_password, &len, cipher_password, tag_offset)) {
-		log_error("EVP_DecryptUpdate() failure");
-		ERR_print_errors_fp(stderr);
-		return -1;
-	}
-	
-	plaintext_len = len;
-
-	if(1!=EVP_DecryptFinal_ex(ctx, *plaintext_password+len, &len)) {
-		log_error("EVP_DecryptFinal_ex() failure");
-		ERR_print_errors_fp(stderr);
-	}
-
-	plaintext_len += len;
-	(*plaintext_password)[plaintext_len] = '\0';
-	EVP_CIPHER_CTX_free(ctx);
 
 	return 1;
 }
@@ -153,8 +79,6 @@ int get_json_base64_key(char **b64_key) {
 	return 1;
 }
 
-
-
 /**
  * Retrieve the base64 masterkey and DPAPI decrypt it
  *
@@ -168,7 +92,8 @@ int get_base64_dpapi_key(char **key, int *key_len) {
 		return -1;
 	}
 
-	if(base64_decode(base64_key, key, key_len) == -1) {
+	*key_len = base64_decode(base64_key, strlen(base64_key), (unsigned char **)key);
+	if(*key_len == -1) {
 		free(base64_key);
 		log_error("base64_decode() failure");
 		return -1;
@@ -183,29 +108,36 @@ int get_base64_dpapi_key(char **key, int *key_len) {
  * 
  * @return 1 on success, -1 on failure 
  */
-int decrypt_chrome_cipher(char *cipher_password, int len_cipher_password, char **plaintext_password, char *masterkey) {
+int decrypt_chrome_cipher(char *cipher_password, int cipher_password_len, char **plaintext_password, char *masterkey) {
 	// TODO: find a better way to check for this
+	// If v9 We just need to DPAPI decrypt
+	// If v10 or v11 we need to AEAD decrypt
 	if(cipher_password[0] == 'v' && cipher_password[1] == '1') {
-		// We strip out the version number ("V10")
+		// We strip out the version number ("v10")
 		cipher_password = &(cipher_password[3]);
-		len_cipher_password -= 3;
+        cipher_password_len -= 3;
 
-		int len_iv = 96 / 8;
-		char iv[len_iv+1];
-		memcpy(iv, cipher_password, len_iv);
-		iv[len_iv] = '\0';
+		int iv_len = 96 / 8;
+		char iv[iv_len + 1];
+		memcpy(iv, cipher_password, iv_len);
+		iv[iv_len] = '\0';
 		// We strip out the IV value (12 bytes);
-		cipher_password = &(cipher_password[len_iv]);
-		len_cipher_password -= len_iv;
+		cipher_password = &(cipher_password[iv_len]);
+        cipher_password_len -= iv_len;
 
-		// 3 - Decrypting the cipher_password
-		if(aead_decrypt(cipher_password, len_cipher_password, masterkey, iv, len_iv, plaintext_password) == -1) {
-			log_error("aead_decrypt failure");
+        // Tag is appended at the end of the cipher data, length is 16
+        size_t tag_len = 16;
+        char *tag = &(cipher_password[cipher_password_len-1-tag_len]);
+        cipher_password_len -= tag_len;
+
+        // 3 - Decrypting the cipher_password
+		if(aead_aes_256_gcm_decrypt(cipher_password, cipher_password_len, NULL, 0, masterkey, iv, iv_len, (unsigned char **)plaintext_password, tag) == -1) {
+			log_error("aead_aes_256_gcm_decrypt() failure");
 			return -1;
 		}
 	}
 	else {
-		if(dpapi_decrypt(cipher_password, len_cipher_password, plaintext_password) == -1) {
+		if(dpapi_decrypt(cipher_password, cipher_password_len, plaintext_password) == -1) {
 			log_error("dpapi_decrypt() failure");
 			return -1;
 		}

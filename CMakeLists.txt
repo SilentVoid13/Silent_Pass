@@ -27,19 +27,29 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
 	endif()
 endif()
 
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/src/utilities/Silent_Log/log.c")
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/src/utilities/Silent_Log/log.c" OR ${PROJECT_SOURCE_DIR}/src/utilities/Silent_OpenSSL/src)
 	message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
 endif()
 
 ### Includes ### 
 
-include_directories(includes includes/linux includes/utilities includes/win32 includes/lib includes/lib/argtable3 includes/lib/iniparser includes/lib/libyuarel includes/lib/cJSON includes/lib/sqlite3 includes/lib/nss includes/lib/nspr src/utilities/Silent_Log)
+include_directories(includes includes/linux includes/utilities includes/win32 includes/lib includes/lib/argtable3 includes/lib/iniparser includes/lib/libyuarel includes/lib/cJSON includes/lib/sqlite3 includes/lib/nss includes/lib/nspr)
+
+### Submodules ###
+include_directories(src/utilities/Silent_Log)
+include_directories(src/utilities/Silent_OpenSSL/includes)
+
+set(SUBMODULES_SOURCES src/utilities/Silent_Log/log.c)
+set(SUBMODULES_SOURCES ${SUBMODULES_SOURCES} src/utilities/Silent_OpenSSL/src/s_aead.c src/utilities/Silent_OpenSSL/src/s_aes.c src/utilities/Silent_OpenSSL/src/s_base64.c src/utilities/Silent_OpenSSL/src/s_pbkdf.c)
+
+set(SOURCES ${SOURCES} ${SUBMODULES_SOURCES})
+message(${SOURCES})
 
 ### Sources ###
 
-set(SOURCES src/chrome.c src/firefox.c src/filezilla.c src/main.c src/git.c)
+set(SOURCES ${SOURCES} src/chrome.c src/firefox.c src/filezilla.c src/main.c src/git.c)
 
-set(UTILITIES_SOURCES src/utilities/functions.c src/utilities/json.c src/utilities/base64.c src/utilities/xml.c src/utilities/Silent_Log/log.c)
+set(UTILITIES_SOURCES src/utilities/functions.c src/utilities/json.c src/utilities/xml.c src/utilities/Silent_Log/log.c)
 set(SOURCES ${SOURCES} ${UTILITIES_SOURCES})
 
 if(WIN32)
