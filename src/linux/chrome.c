@@ -96,7 +96,7 @@ int decrypt_gnome_cipher(char *cipher_password, int len_cipher_password, char **
 	size_t masterkey_len = strlen(masterkey);
 	size_t salt_len = strlen(salt);
 
-	if(pbkdf2_hmac_derive(masterkey, masterkey_len, salt, salt_len, 1, "sha1", output_key, KEY_LENGTH) == -1) {
+	if(s_pbkdf2_hmac_derive(masterkey, masterkey_len, salt, salt_len, 1, "sha1", output_key, KEY_LENGTH) == -1) {
 	    log_error("pbkdf2_hmac_derive() failure");
 	    return -1;
 	}
@@ -113,7 +113,7 @@ int decrypt_gnome_cipher(char *cipher_password, int len_cipher_password, char **
     char *good_cipher_password = &cipher_password[3];
     int good_cipher_len = len_cipher_password - 3;
 
-    if(aes_decrypt("aes_128_cbc", good_cipher_password, good_cipher_len, output_key, iv, (unsigned char **)plaintext_password) == -1) {
+    if(s_aes_decrypt("aes_128_cbc", good_cipher_password, good_cipher_len, output_key, iv, (unsigned char **)plaintext_password) == -1) {
 		log_error("aes_decrypt() failure");
 		return -1;
 	}

@@ -92,7 +92,7 @@ int get_base64_dpapi_key(char **key, int *key_len) {
 		return -1;
 	}
 
-	*key_len = base64_decode(base64_key, strlen(base64_key), (unsigned char **)key);
+	*key_len = s_base64_decode(base64_key, strlen(base64_key), (unsigned char **)key);
 	if(*key_len == -1) {
 		free(base64_key);
 		log_error("base64_decode() failure");
@@ -131,7 +131,8 @@ int decrypt_chrome_cipher(char *cipher_password, int cipher_password_len, char *
         cipher_password_len -= tag_len;
 
         // 3 - Decrypting the cipher_password
-		if(aead_aes_256_gcm_decrypt(cipher_password, cipher_password_len, NULL, 0, masterkey, iv, iv_len, (unsigned char **)plaintext_password, tag) == -1) {
+		if(s_aead_aes_256_gcm_decrypt(cipher_password, cipher_password_len, NULL, 0, masterkey, iv, iv_len, (unsigned char **)plaintext_password, tag) == -1) {
+		    printf("plaintext_password : %s\n", plaintext_password);
 			log_error("aead_aes_256_gcm_decrypt() failure");
 			return -1;
 		}
