@@ -123,8 +123,6 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, c
 		cur = cur->next;
 	}
 
-	puts("here4");
-
 	if(cipher_password != NULL) {
 		int cipher_password_len = (int)strlen(cipher_password);
 		if(s_base64_decode(cipher_password, cipher_password_len, &plaintext_password) == -1) {
@@ -137,7 +135,6 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, c
 		free(cipher_password);
 	}
 
-	puts("here44");
 	// We only add to input file when we have full creds (Maybe change that ?)
 	if(output_file != NULL && host != NULL && username != NULL && plaintext_password != NULL) {
 		FILE *output_fd = fopen(output_file, "ab");
@@ -148,26 +145,18 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, c
 		fclose(output_fd);
 	}
 
-    puts("here45");
-
 	printf("\n");
-    puts("here46");
 	if(host != NULL) {
-        puts("here54");
 		log_success("Host : %s", host);
-		puts("here55");
 		free(host);
 	}
-	puts("here6");
 	if(port[0] != -1) {
 		log_success("Port : %s", port);
 	}
-    puts("here7");
 	if(username != NULL) {
 		log_success("Username: %s", username);
 		free(username);
 	}
-    puts("here8");
 	if(plaintext_password != NULL) {
 		log_success("Password : %s", plaintext_password);
 		free(plaintext_password);
