@@ -127,13 +127,13 @@ int decrypt_chrome_cipher(char *cipher_password, int cipher_password_len, char *
 
         // Tag is appended at the end of the cipher data, length is 16
         size_t tag_len = 16;
-        char *tag = &(cipher_password[cipher_password_len-1-tag_len]);
+        char *tag = &(cipher_password[cipher_password_len-tag_len]);
         cipher_password_len -= tag_len;
 
         // 3 - Decrypting the cipher_password
 		if(s_aead_aes_256_gcm_decrypt(cipher_password, cipher_password_len, NULL, 0, masterkey, iv, iv_len, (unsigned char **)plaintext_password, tag) == -1) {
 		    printf("plaintext_password : %s\n", plaintext_password);
-			log_error("aead_aes_256_gcm_decrypt() failure");
+			log_error("s_aead_aes_256_gcm_decrypt() failure");
 			return -1;
 		}
 	}

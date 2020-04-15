@@ -36,7 +36,7 @@ int fetch_sqlite_data(char **website, char **username, char **cipher_password, i
 	*website = malloc(strlen(sqlite3_column_text(*stmt, 0))+1);
 	*username = malloc(strlen(sqlite3_column_text(*stmt, 1))+1);
 	*cipher_password = malloc(sqlite3_column_bytes(*stmt, 2)+1);
-	if(*website == 0 || *username == 0 || *cipher_password == 0) {
+	if(*website == NULL || *username == NULL || *cipher_password == NULL) {
 		log_error("malloc() failure");
 		free(*website);
 		free(*username);
