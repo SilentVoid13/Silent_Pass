@@ -132,7 +132,6 @@ int decrypt_chrome_cipher(char *cipher_password, int cipher_password_len, char *
 
         // 3 - Decrypting the cipher_password
 		if(s_aead_aes_256_gcm_decrypt(cipher_password, cipher_password_len, NULL, 0, masterkey, iv, iv_len, (unsigned char **)plaintext_password, tag) == -1) {
-		    printf("plaintext_password : %s\n", plaintext_password);
 			log_error("s_aead_aes_256_gcm_decrypt() failure");
 			return -1;
 		}
