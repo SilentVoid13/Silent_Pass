@@ -4,6 +4,7 @@
 #include "log.h"
 #include "xml.h"
 #include "s_base64.h"
+#include "s_curve.h"
 #include "functions.h"
 
 int parse_sitemanager_xml(const char *output_file, const char *master_password, char *path) {
@@ -26,7 +27,7 @@ int parse_sitemanager_xml(const char *output_file, const char *master_password, 
 	char *node_name = "Server";
 	while(cur != NULL) {
 		if(xmlStrcmp(cur->name, (const xmlChar *) node_name) == 0) {
-			parse_xml_password(doc, cur->xmlChildrenNode, output_file, master_password);	
+			parse_server_xml(doc, cur->xmlChildrenNode, output_file, master_password);
 		}
 		cur = cur->next;
 	}
@@ -58,7 +59,7 @@ int parse_recentservers_xml(const char *output_file, const char *master_password
 	char *node_name = "Server";
 	while(cur != NULL) {
 		if(xmlStrcmp(cur->name, (const xmlChar *) node_name) == 0) {
-			parse_xml_password(doc, cur->xmlChildrenNode, output_file, master_password);	
+			parse_server_xml(doc, cur->xmlChildrenNode, output_file, master_password);
 		}
 		cur = cur->next;
 	}
@@ -70,14 +71,14 @@ int parse_recentservers_xml(const char *output_file, const char *master_password
 	return 1;
 }
 
-int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, const char *master_password) {
+int parse_server_xml(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, const char *master_password) {
     // For warning
     (void) master_password;
 
 	xmlChar *key;
 	char *host = NULL;
 	char *username = NULL;
-	char *cipher_password = NULL;
+	unsigned char *cipher_password = NULL;
 	unsigned char *plaintext_password = NULL;
 	char port[6] = {-1};
 
@@ -96,14 +97,7 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, c
 				safe_strcpy(username, key, key_len);
 			}
 			else if(strcmp(cur->name, "Pass") == 0) {
-                key_len = strlen(key);
-				cipher_password = malloc(key_len+1);
-                if(cipher_password == NULL) {
-                    free(cipher_password);
-                    log_error("malloc() failure");
-                    return -1;
-                }
-				safe_strcpy(cipher_password, key, key_len);
+			    decrypt_filezilla_password(cur, key, strlen(key), &plaintext_password, master_password);
 			}
 			else if(strcmp(cur->name, "Host") == 0) {
                 key_len = strlen(key);
@@ -124,15 +118,7 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, c
 	}
 
 	if(cipher_password != NULL) {
-		int cipher_password_len = (int)strlen(cipher_password);
-		if(s_base64_decode(cipher_password, cipher_password_len, &plaintext_password) == -1) {
-			free(username);
-			free(cipher_password);
-			free(host);
-			log_error("base64_decode() failure");
-			return -1;
-		}
-		free(cipher_password);
+
 	}
 
 	// We only add to input file when we have full creds (Maybe change that ?)
@@ -163,6 +149,65 @@ int parse_xml_password(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, c
 	}
 
 	return 1;
+}
+
+int decrypt_filezilla_password(xmlNodePtr cur, unsigned char *ciphertext, size_t ciphertext_len, unsigned char **plaintext_password, const char *master_password) {
+    xmlChar *encoding;
+    encoding = xmlGetProp(cur, "encoding");
+    if(encoding == NULL) {
+        log_error("Couldn't retrieve XML attribute");
+        return -1;
+    }
+
+    if(strcmp(encoding, "base64") == 0) {
+        if(s_base64_decode(ciphertext, ciphertext_len, plaintext_password) == -1) {
+            log_error("base64_decode() failure");
+            return -1;
+        }
+    }
+    else if(strcmp(encoding, "crypt") == 0) {
+        xmlChar *pubkey;
+        pubkey = xmlGetProp(cur, "pubkey");
+        if(pubkey == NULL) {
+            log_error("Couldn't retrieve XML attribute");
+            return -1;
+        }
+
+        unsigned char *ciphertext_decoded;
+        size_t ciphertext_decoded_len;
+        if((ciphertext_decoded_len = s_base64_decode(ciphertext, ciphertext_len, &ciphertext_decoded)) == -1u) {
+            log_error("base64_decode() failure");
+            return -1;
+        }
+
+        unsigned char *private_key;
+        if(s_base64_decode(pubkey, strlen(pubkey), &private_key) == -1) {
+            log_error("base64_decode() failure");
+            return -1;
+        }
+
+        unsigned char *e_key            =   &(ciphertext_decoded[F_KEY_OFFSET]);
+        unsigned char *e_salt           =   &(ciphertext_decoded[F_SALT_OFFSET]);
+        unsigned char *cipher_password  =   &(ciphertext_decoded[F_CIPHER_PASSWORD_OFFSET]);
+        unsigned char *tag              =   &(ciphertext_decoded[ciphertext_decoded_len-F_TAG_LENGTH]);
+
+        unsigned char *private_key_key  =   &(private_key[F_KEY_OFFSET]);
+
+        unsigned char *shared_secret;
+        size_t shared_secret_len;
+        if((shared_secret_len = s_curve_shared_secret("X25519", e_key, 32, private_key_key, 32, &shared_secret)) == -1u) {
+            log_error("s_curve_shared_secret() failure");
+            return -1;
+        }
+
+
+     }
+    else {
+        log_error("Invalid XML attribute value");
+        return -1;
+    }
+
+    return 1;
 }
 
 int dump_filezilla(const char *output_file, const char *master_password) {
