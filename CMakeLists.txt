@@ -40,7 +40,7 @@ include_directories(src/utilities/Silent_Log)
 include_directories(src/utilities/Silent_OpenSSL/includes)
 
 set(SUBMODULES_SOURCES src/utilities/Silent_Log/log.c)
-set(SUBMODULES_SOURCES ${SUBMODULES_SOURCES} src/utilities/Silent_OpenSSL/src/s_aead.c src/utilities/Silent_OpenSSL/src/s_aes.c src/utilities/Silent_OpenSSL/src/s_base64.c src/utilities/Silent_OpenSSL/src/s_pbkdf.c)
+set(SUBMODULES_SOURCES ${SUBMODULES_SOURCES} src/utilities/Silent_OpenSSL/src/s_aead.c src/utilities/Silent_OpenSSL/src/s_aes.c src/utilities/Silent_OpenSSL/src/s_base64.c src/utilities/Silent_OpenSSL/src/s_pbkdf.c src/utilities/Silent_OpenSSL/src/s_digest.c src/utilities/Silent_OpenSSL/src/s_curve.c)
 
 set(SOURCES ${SOURCES} ${SUBMODULES_SOURCES})
 message(${SOURCES})

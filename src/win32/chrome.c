@@ -92,7 +92,7 @@ int get_base64_dpapi_key(char **key, int *key_len) {
 		return -1;
 	}
 
-	*key_len = s_base64_decode(base64_key, strlen(base64_key), (unsigned char **)key);
+	*key_len = s_base64_decode(base64_key, strlen(base64_key), (unsigned char **)key, 1);
 	if(*key_len == -1) {
 		free(base64_key);
 		log_error("base64_decode() failure");
