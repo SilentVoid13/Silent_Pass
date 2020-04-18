@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <libxml/globals.h>
 #include <libxml/xmlreader.h>
 
 xmlNodePtr retrieve_xml_node(xmlNodePtr cur, char *node_name);

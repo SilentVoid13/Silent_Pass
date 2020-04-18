@@ -57,8 +57,8 @@ int get_gnome_masterkey(char *login_data_path, char **masterkey) {
 	else {
 		*masterkey = (char *)malloc(strlen(password)+1); 
 		if(*masterkey == 0) {
+            free(*masterkey);
 			log_error("malloc() failure");
-			free(*masterkey);
 			return -1;
 		}
 		memcpy(*masterkey, password, strlen(password));

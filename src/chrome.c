@@ -37,10 +37,10 @@ int fetch_sqlite_data(char **website, char **username, char **cipher_password, i
 	*username = malloc(strlen(sqlite3_column_text(*stmt, 1))+1);
 	*cipher_password = malloc(sqlite3_column_bytes(*stmt, 2)+1);
 	if(*website == NULL || *username == NULL || *cipher_password == NULL) {
-		log_error("malloc() failure");
 		free(*website);
 		free(*username);
 		free(*cipher_password);
+        log_error("malloc() failure");
 		return -1;
 	}
 
@@ -73,6 +73,9 @@ int get_chrome_creds(char *login_data_path, const char *output) {
 
 	char *masterkey;
 	if(get_masterkey(login_data_path, &masterkey) == -1) {
+        sqlite3_finalize(stmt);
+	    sqlite3_close(db);
+	    free(masterkey);
 		log_error("get_masterkey() failure");
 		return -1;
 	}
@@ -89,33 +92,42 @@ int get_chrome_creds(char *login_data_path, const char *output) {
 	}
 
 	while(sqlite3_step(stmt) != SQLITE_DONE) {
+	    website = NULL; username = NULL; cipher_password = NULL; plaintext_password = NULL;
 		if(fetch_sqlite_data(&website, &username, &cipher_password, &len_cipher_password, &stmt) == -1) {
+            sqlite3_finalize(stmt);
+            sqlite3_close(db);
+            free(masterkey);
 			log_error("fetch_sqlite_data() failure");
 			return -1;
-		} 
-		if(strlen(website) != 0) {
-			if(decrypt_chrome_cipher(cipher_password, len_cipher_password, &plaintext_password, masterkey) == -1) {
-				log_error("decrypt_chrome_cipher() failure");
-				return -1;
-			}
-
-			log_success("Website : %s", website);
-			log_success("Username: %s", username);
-			log_success("Password: %s\n", plaintext_password);
-
-			if(output != NULL) {
-				fprintf(output_fd, "\"%s\",\"%s\",\"%s\"\n", 
-					website,
-					username,
-					plaintext_password);
-			}
-
-			free(website);
-			free(username);
-			free(cipher_password);
-			free(plaintext_password);
 		}
-	}
+		if(website != NULL && strlen(website) > 0) {
+            log_success("Website : %s", website);
+		}
+		if(username != NULL && strlen(username) > 0) {
+            log_success("Username: %s", username);
+		}
+		if(cipher_password != NULL && len_cipher_password > 0) {
+            if(decrypt_chrome_cipher(cipher_password, len_cipher_password, &plaintext_password, masterkey) == -1) {
+                log_error("decrypt_chrome_cipher() failure");
+            }
+            if(plaintext_password != NULL && strlen(plaintext_password) > 0) {
+                log_success("Password: %s\n", plaintext_password);
+            }
+        }
+
+        // TODO: We only add to input file when we have full creds (Maybe change that ?)
+        if(output != NULL && website != NULL && username != NULL && plaintext_password != NULL) {
+            fprintf(output_fd, "\"%s\",\"%s\",\"%s\"\n",
+                website,
+                username,
+                plaintext_password);
+        }
+
+        free(website);
+        free(username);
+        free(cipher_password);
+        free(plaintext_password);
+    }
 
 	if(output != NULL) {
 		fclose(output_fd);
@@ -123,6 +135,7 @@ int get_chrome_creds(char *login_data_path, const char *output) {
 	if(masterkey != NULL) {
 		free(masterkey);
 	}
+	sqlite3_finalize(stmt);
 	sqlite3_close(db);
 
 	return 1;

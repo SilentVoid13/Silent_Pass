@@ -9,9 +9,11 @@
 #include "xml.h"
 
 #define F_KEY_OFFSET 0
+#define F_KEY_LEN 32
 #define F_SALT_OFFSET 32
+#define F_SALT_LEN 32
 #define F_CIPHER_PASSWORD_OFFSET 64
-#define F_TAG_LENGTH 16
+#define F_TAG_LEN 16
 
 int parse_sitemanager_xml(const char *output_file, const char *master_password, char *path);
 int parse_recentservers_xml(const char *output_file, const char *master_password, char *path);

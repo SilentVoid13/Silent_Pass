@@ -161,35 +161,33 @@ int nss_authenticate(char *profile_path, void *key_slot, const char *master_pass
 	load_firefox_libs();
 	if(NSS_Init(profile_path) != SECSuccess) {
 		log_error("NSS Initialisation failed");
-		fflush(stderr);
 		return -1;
 	}
 
 	// We get the key[3-4].db file
 	if((key_slot = PK11_GetInternalKeySlot()) == NULL) {
 		log_error("PK11_GetInternalKeySlot() failed");
-		fflush(stderr);
 		return -1;
 	}
 
 	if(master_password != NULL) {
 		if(PK11_CheckUserPassword(key_slot, (char *)master_password) != SECSuccess) {
+            free_pk11_nss(key_slot);
 			log_error("PK11_CheckUserPassword() failed, Wrong master password");
-			fflush(stderr);
 			return -1;
 		}
 	} else {
 		// We check if we can open it with no password
 		if(PK11_CheckUserPassword(key_slot, "") != SECSuccess) {
+            free_pk11_nss(key_slot);
 			log_error("PK11_CheckUserPassword() failed, Try with --master-firefox <PASSWORD> option");
-			fflush(stderr);
 			return -1;
 		}
 	}
 
 	if(PK11_Authenticate(key_slot, TRUE, NULL) != SECSuccess) {
-		log_error("PK11_Authenticate() failed");
-		fflush(stderr);
+        free_pk11_nss(key_slot);
+        log_error("PK11_Authenticate() failed");
 		return -1;
 	}
 

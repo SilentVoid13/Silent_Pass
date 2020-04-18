@@ -18,12 +18,15 @@ int get_firefox_creds(char *profile_path, char *logins_path, const char *output_
 
 	char *json;
 	if(parse_json(logins_path, &json) == -1) {
-		log_error("parse_json failed()");
+        free_pk11_nss(key_slot);
+        log_error("parse_json failed()");
 		return -1;
 	}
 
 	cJSON* values = cJSON_Parse(json);
 	if(values == NULL) {
+        free_pk11_nss(key_slot);
+        free(json);
 		log_error("cJSON_Parse() failed");
 		fflush(stderr);
 		return -1;
@@ -35,7 +38,8 @@ int get_firefox_creds(char *profile_path, char *logins_path, const char *output_
 	cJSON *cipher_username = NULL;
 	cJSON *cipher_password = NULL;
 
-	char *username, *password;
+	char *username;
+	char *password;
 
 	logins_array = cJSON_GetObjectItemCaseSensitive(values, "logins");	
 
@@ -45,30 +49,40 @@ int get_firefox_creds(char *profile_path, char *logins_path, const char *output_
 	}
 
 	cJSON_ArrayForEach(logins, logins_array) {
-		hostname = cJSON_GetObjectItemCaseSensitive(logins, "hostname");	
+	    username = NULL; password = NULL;
+		hostname = cJSON_GetObjectItemCaseSensitive(logins, "hostname");
 		cipher_username = cJSON_GetObjectItemCaseSensitive(logins, "encryptedUsername");	
 		cipher_password = cJSON_GetObjectItemCaseSensitive(logins, "encryptedPassword");	
 
-		if (cJSON_IsString(cipher_username) && cJSON_IsString(cipher_password) && cJSON_IsString(hostname)) {
-			if(strlen(hostname->valuestring) > 0) {
-				decrypt_firefox_cipher(cipher_username->valuestring, &username);
-				decrypt_firefox_cipher(cipher_password->valuestring, &password);
-
-				log_success("Website : %s", hostname->valuestring);
-				log_success("Username : %s", username);
-				log_success("Password : %s\n", password);
-
-				if(output_file != NULL) {
-					fprintf(output_fd, "\"%s\",\"%s\",\"%s\"\n", 
-						hostname->valuestring,
-						username,
-						password);
-				}
-
-				free(username);
-				free(password);
-			}
+		if (cJSON_IsString(hostname) && strlen(hostname->valuestring) > 0) {
+            log_success("Website : %s", hostname->valuestring);
 		}
+		if(cJSON_IsString(cipher_username) && strlen(cipher_username->valuestring) > 0) {
+            if(decrypt_firefox_cipher(cipher_username->valuestring, &username) == -1) {
+                log_error("decrypt_firefox_cipher() failure");
+                return -1;
+            }
+            if(username != NULL) {
+                log_success("Username : %s", username);
+                free(username);
+            }
+		}
+		if(cJSON_IsString(cipher_password) && strlen(cipher_password->valuestring) > 0) {
+            if(decrypt_firefox_cipher(cipher_password->valuestring, &password) == -1) {
+                log_error("decrypt_firefox_cipher() failure");
+                return -1;
+            }
+            if(password != NULL) {
+                log_success("Password : %s\n", password);
+                free(password);
+            }
+        }
+        if(output_file != NULL && cJSON_IsString(hostname) && username != NULL && password != NULL) {
+            fprintf(output_fd, "\"%s\",\"%s\",\"%s\"\n",
+                hostname->valuestring,
+                username,
+                password);
+        }
 	}
 
 	// We free the memory of everything.	
@@ -93,8 +107,8 @@ int dump_firefox(const char *output_file, const char *master_password) {
 	char firefox_path[MAX_PATH_SIZE];
 	char profiles_ini_path[MAX_PATH_SIZE];
 	char profile[MAX_PATH_SIZE];
-	char profile_path[MAX_PATH_SIZE];
-	char logins_path[MAX_PATH_SIZE];
+	char profile_path[MAX_PATH_SIZE*2+2];
+	char logins_path[sizeof(profile_path)+MAX_PATH_SIZE];
 
 	load_firefox_paths(firefox_path, profiles_ini_path);
 
@@ -104,8 +118,8 @@ int dump_firefox(const char *output_file, const char *master_password) {
 		return -1;
 	}
 
-	snprintf(profile_path, MAX_PATH_SIZE, "%s%s%s", firefox_path, "/", profile);
-	snprintf(logins_path, MAX_PATH_SIZE, "%s/logins.json", profile_path);
+	snprintf(profile_path, sizeof(profile_path), "%s%s%s", firefox_path, "/", profile);
+	snprintf(logins_path, sizeof(logins_path), "%s/logins.json", profile_path);
 	
 	// TODO: S_OK / F_OK
 	if(access(logins_path, 0) != -1) {

@@ -117,11 +117,12 @@ int parse_server_xml(xmlDocPtr doc, xmlNodePtr cur, const char *output_file, con
                 key_len = strlen(key);
 				safe_strcpy(port, key, key_len);
 			}
+            xmlFree(key);
 		}
 		cur = cur->next;
 	}
 
-	// We only add to input file when we have full creds (Maybe change that ?)
+	// TODO: We only add to input file when we have full creds (Maybe change that ?)
 	if(output_file != NULL && host != NULL && username != NULL && decryption_result == 1) {
 		FILE *output_fd = fopen(output_file, "ab");
 		fprintf(output_fd, "\"%s\",\"%s\",\"%s\"\n", 
@@ -155,25 +156,29 @@ int decrypt_filezilla_password(xmlNodePtr cur, unsigned char *ciphertext, size_t
     xmlChar *encoding;
     encoding = xmlGetProp(cur, "encoding");
     if(encoding == NULL) {
+        xmlFree(encoding);
         log_error("Couldn't retrieve XML attribute");
         return -1;
     }
 
     if(strcmp(encoding, "base64") == 0) {
+        xmlFree(encoding);
         if(s_base64_decode(ciphertext, ciphertext_len, plaintext_password, 1) == -1) {
             log_error("base64_decode() failure");
             return -1;
         }
     }
     else if(strcmp(encoding, "crypt") == 0) {
+        xmlFree(encoding);
         if(master_password == NULL) {
-            log_error("Password is encrypted, try with --master-filezilla option");
+            log_error("Password is encrypted, try with --master-filezilla <password> option");
             return -1;
         }
 
         xmlChar *pubkey;
         pubkey = xmlGetProp(cur, "pubkey");
         if(pubkey == NULL) {
+            xmlFree(pubkey);
             log_error("Couldn't retrieve XML attribute");
             return -1;
         }
@@ -181,41 +186,44 @@ int decrypt_filezilla_password(xmlNodePtr cur, unsigned char *ciphertext, size_t
         unsigned char *ciphertext_decoded;
         size_t ciphertext_decoded_len;
         if((ciphertext_decoded_len = s_base64_decode(ciphertext, ciphertext_len, &ciphertext_decoded, 1)) == -1u) {
+            xmlFree(pubkey);
             log_error("base64_decode() failure");
             return -1;
         }
 
-        unsigned char *public_key;
-        int public_key_len;
-        if((public_key_len = s_base64_decode(pubkey, strlen(pubkey), &public_key, 0)) == -1) {
+        unsigned char *master_public_key;
+        int master_public_key_len;
+        if((master_public_key_len = s_base64_decode(pubkey, strlen(pubkey), &master_public_key, 0)) == -1) {
+            xmlFree(pubkey);
             free(ciphertext_decoded);
             log_error("base64_decode() failure");
             return -1;
         }
+        xmlFree(pubkey);
 
-        size_t cipher_password_len = ciphertext_decoded_len - 32 - 32 - 16;
+        size_t cipher_password_len = ciphertext_decoded_len - F_KEY_LEN - F_SALT_LEN - F_TAG_LEN;
 
-        unsigned char *e_key            =   &(ciphertext_decoded[F_KEY_OFFSET]);
-        unsigned char *e_salt           =   &(ciphertext_decoded[F_SALT_OFFSET]);
+        unsigned char *e_public_key_key            =   &(ciphertext_decoded[F_KEY_OFFSET]);
+        unsigned char *e_public_key_salt           =   &(ciphertext_decoded[F_SALT_OFFSET]);
         unsigned char *cipher_password  =   &(ciphertext_decoded[F_CIPHER_PASSWORD_OFFSET]);
-        unsigned char *tag              =   &(ciphertext_decoded[ciphertext_decoded_len-F_TAG_LENGTH]);
+        unsigned char *tag              =   &(ciphertext_decoded[ciphertext_decoded_len-F_TAG_LEN]);
 
-        unsigned char *public_key_key  =   &(public_key[F_KEY_OFFSET]);
-        unsigned char *public_key_salt  =   &(public_key[F_SALT_OFFSET]);
+        unsigned char *master_public_key_key  =   &(master_public_key[F_KEY_OFFSET]);
+        unsigned char *master_public_key_salt  =   &(master_public_key[F_SALT_OFFSET]);
 
         int iterations = 100000;
-        unsigned char private_key_key[32];
-        if(s_pbkdf2_hmac_derive(master_password, strlen(master_password), public_key_salt, 32, iterations, "sha256", private_key_key, 32) == -1) {
+        unsigned char master_private_key_key[F_KEY_LEN];
+        if(s_pbkdf2_hmac_derive(master_password, strlen(master_password), master_public_key_salt, F_SALT_LEN, iterations, "sha256", master_private_key_key, 32) == -1) {
             log_error("s_pbkdf2_hmac_derive() failure");
             return -1;
         }
-        private_key_key[0] &= 248; // NOLINT(hicpp-signed-bitwise)
-        private_key_key[31] &= 127; // NOLINT(hicpp-signed-bitwise)
-        private_key_key[31] |= 64; // NOLINT(hicpp-signed-bitwise)
+        master_private_key_key[0] &= 248; // NOLINT(hicpp-signed-bitwise)
+        master_private_key_key[31] &= 127; // NOLINT(hicpp-signed-bitwise)
+        master_private_key_key[31] |= 64; // NOLINT(hicpp-signed-bitwise)
 
         unsigned char *shared_secret;
         size_t shared_secret_len;
-        if((shared_secret_len = s_curve_shared_secret("X25519", e_key, 32, private_key_key, 32, &shared_secret)) == -1u) {
+        if((shared_secret_len = s_curve_shared_secret("X25519", e_public_key_key, F_KEY_LEN, master_private_key_key, F_KEY_LEN, &shared_secret)) == -1u) {
             free(ciphertext_decoded);
             log_error("s_curve_shared_secret() failure");
             return -1;
@@ -226,51 +234,51 @@ int decrypt_filezilla_password(xmlNodePtr cur, unsigned char *ciphertext, size_t
         if((digester = s_digest_init(digest_mode)) == NULL) {
             free(ciphertext_decoded);
             free(shared_secret);
-            free(public_key_key);
+            free(master_public_key);
             log_error("s_digest_init() failure");
             return -1;
         }
 
         // Getting aes_key digest
-        if((digester = s_digest_update(digester, e_salt, 32)) == NULL) {
+        if((digester = s_digest_update(digester, e_public_key_salt, 32)) == NULL) {
             free(ciphertext_decoded);
             free(shared_secret);
-            free(public_key_key);
+            free(master_public_key);
             log_error("s_digest_update() failure");
             return -1;
         }
         if((digester = s_digest_update(digester, "\0", 1)) == NULL) {
             free(ciphertext_decoded);
             free(shared_secret);
-            free(public_key_key);
+            free(master_public_key);
             log_error("s_digest_update() failure");
             return -1;
         }
         if((digester = s_digest_update(digester, shared_secret, shared_secret_len)) == NULL) {
             free(ciphertext_decoded);
             free(shared_secret);
-            free(public_key_key);
+            free(master_public_key);
             log_error("s_digest_update() failure");
             return -1;
         }
-        if((digester = s_digest_update(digester, e_key, 32)) == NULL) {
+        if((digester = s_digest_update(digester, e_public_key_key, 32)) == NULL) {
             free(ciphertext_decoded);
             free(shared_secret);
-            free(public_key_key);
+            free(master_public_key);
             log_error("s_digest_update() failure");
             return -1;
         }
-        if((digester = s_digest_update(digester, public_key_key, 32)) == NULL) {
+        if((digester = s_digest_update(digester, master_public_key_key, 32)) == NULL) {
             free(ciphertext_decoded);
             free(shared_secret);
-            free(public_key_key);
+            free(master_public_key);
             log_error("s_digest_update() failure");
             return -1;
         }
-        if((digester = s_digest_update(digester, public_key_salt, 32)) == NULL) {
+        if((digester = s_digest_update(digester, master_public_key_salt, 32)) == NULL) {
             free(ciphertext_decoded);
             free(shared_secret);
-            free(public_key_key);
+            free(master_public_key);
             log_error("s_digest_update() failure");
             return -1;
         }
@@ -280,7 +288,7 @@ int decrypt_filezilla_password(xmlNodePtr cur, unsigned char *ciphertext, size_t
         if((aes_key_len = s_digest_digest(digester, digest_mode, &aes_key)) == -1) {
             free(ciphertext_decoded);
             free(shared_secret);
-            free(public_key_key);
+            free(master_public_key);
             log_error("s_digest_digest() failure");
             return -1;
         }
@@ -294,17 +302,17 @@ int decrypt_filezilla_password(xmlNodePtr cur, unsigned char *ciphertext, size_t
         if((digester = s_digest_init(digest_mode)) == NULL) {
             free(ciphertext_decoded);
             free(shared_secret);
-            free(public_key_key);
+            free(master_public_key);
             free(aes_key);
             log_error("s_digest_init() failure");
             return -1;
         }
 
         // Getting iv digest
-        if((digester = s_digest_update(digester, e_salt, 32)) == NULL) {
+        if((digester = s_digest_update(digester, e_public_key_salt, 32)) == NULL) {
             free(ciphertext_decoded);
             free(shared_secret);
-            free(public_key_key);
+            free(master_public_key);
             free(aes_key);
             log_error("s_digest_update() failure");
             return -1;
@@ -312,7 +320,7 @@ int decrypt_filezilla_password(xmlNodePtr cur, unsigned char *ciphertext, size_t
         if((digester = s_digest_update(digester, "\2", 1)) == NULL) {
             free(ciphertext_decoded);
             free(shared_secret);
-            free(public_key_key);
+            free(master_public_key);
             free(aes_key);
             log_error("s_digest_update() failure");
             return -1;
@@ -320,35 +328,36 @@ int decrypt_filezilla_password(xmlNodePtr cur, unsigned char *ciphertext, size_t
         if((digester = s_digest_update(digester, shared_secret, shared_secret_len)) == NULL) {
             free(ciphertext_decoded);
             free(shared_secret);
-            free(public_key_key);
+            free(master_public_key);
             free(aes_key);
             log_error("s_digest_update() failure");
             return -1;
         }
         free(shared_secret);
 
-        if((digester = s_digest_update(digester, e_key, 32)) == NULL) {
+        if((digester = s_digest_update(digester, e_public_key_key, 32)) == NULL) {
             free(ciphertext_decoded);
-            free(public_key_key);
+            free(master_public_key);
             free(aes_key);
             log_error("s_digest_update() failure");
             return -1;
         }
-        if((digester = s_digest_update(digester, public_key_key, 32)) == NULL) {
+        if((digester = s_digest_update(digester, master_public_key_key, 32)) == NULL) {
             free(ciphertext_decoded);
-            free(public_key_key);
+            free(master_public_key);
             free(aes_key);
             log_error("s_digest_update() failure");
             return -1;
         }
-        free(public_key_key);
 
-        if((digester = s_digest_update(digester, public_key_salt, 32)) == NULL) {
+        if((digester = s_digest_update(digester, master_public_key_salt, 32)) == NULL) {
             free(ciphertext_decoded);
             free(aes_key);
+            free(master_public_key);
             log_error("s_digest_update() failure");
             return -1;
         }
+        free(master_public_key);
 
         unsigned char *iv;
         int iv_len;
@@ -359,19 +368,21 @@ int decrypt_filezilla_password(xmlNodePtr cur, unsigned char *ciphertext, size_t
             return -1;
         }
         // 12
-        iv_len = F_TAG_LENGTH - 4;
+        iv_len = F_TAG_LEN - 4;
 
         if(s_aead_aes_256_gcm_decrypt(cipher_password, cipher_password_len, NULL, 0, aes_key, iv, iv_len, plaintext_password, tag) == -1) {
             free(ciphertext_decoded);
             free(aes_key);
             free(iv);
-            log_error("s_aead_aes_256_gcm_decrypt() failure");
+            log_error("s_aead_aes_256_gcm_decrypt() failed, Wrong master password");
             return -1;
         }
+        free(ciphertext_decoded);
         free(aes_key);
         free(iv);
     }
     else {
+        xmlFree(encoding);
         log_error("Invalid XML attribute value");
         return -1;
     }

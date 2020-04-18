@@ -12,6 +12,14 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-pointer-sign")
 
+# To avoid libxml xmlFree error
+# https://stackoverflow.com/questions/4984853/mingw-libxml2-issue
+# https://github.com/msys2/MSYS2-packages/issues/171
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DIN_LIBXML")
+
+# For valgrind line numbers
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
+
 ### Git Submodule management ###
 find_package(Git REQUIRED)
 if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
