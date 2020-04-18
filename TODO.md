@@ -56,8 +56,8 @@
 - [x] Test Vault for Windows 7
 
 ## For FileZilla
-- [ ] Add master password support
-- [ ] Clean code
+- [x] Add master password support
+- [x] Clean code
 - [x] Add output file support
 - [x] Add MinGW libxml support (for Windows)
 - [x] Add error checks
