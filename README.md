@@ -4,8 +4,6 @@ Silent_Pass is a cross-platform software credential harvester written in pure C.
 
 It currently supports Linux and Windows OS. 32 bit version is available, so it should work on most of the machines, even older ones.
 
-I wrote this program mainly for entertainment and to learn more. My code is surely not perfect, do not hesitate to make pull requests or to contact me for any problems / code enhancement suggestion at silentvoid13@protonmail.com.
-
 ## License
 
 Silent_Pass is licensed under the GNU AGPLv3 license. Refer to [LICENSE](https://github.com/SilentVoid13/Silent_Pass/blob/master/LICENSE.txt) for more informations.
