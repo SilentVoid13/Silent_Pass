@@ -4,3 +4,15 @@
 [submodule "src/utilities/Silent_OpenSSL"]
 	path = src/utilities/Silent_OpenSSL
 	url = https://github.com/SilentVoid13/Silent_OpenSSL.git
+[submodule "extern/argtable3"]
+	path = extern/argtable3
+	url = git@github.com:argtable/argtable3.git
+[submodule "extern/libyuarel"]
+	path = extern/libyuarel
+	url = git@github.com:jacketizer/libyuarel.git
+[submodule "extern/cJSON"]
+	path = extern/cJSON
+	url = git@github.com:DaveGamble/cJSON.git
+[submodule "extern/iniparser"]
+	path = extern/iniparser
+	url = git@github.com:ndevilla/iniparser.git
