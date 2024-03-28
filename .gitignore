@@ -3,6 +3,7 @@
 *.sh
 !compile_all.sh
 !clean.sh
+/build
 
 docs
 silent*
