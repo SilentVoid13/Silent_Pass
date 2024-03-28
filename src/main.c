@@ -12,7 +12,7 @@ struct arg_str *master_firefox, *master_filezilla;
 struct arg_file *output;
 struct arg_end *end;
 
-int verbose;
+extern int verbose;
 
 void display_argtable_help(char *progname, void **argtable) {
     printf("Usage: %s", progname);

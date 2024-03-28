@@ -1,6 +1,6 @@
 ### Basic cmake setup ###
 
-cmake_minimum_required(VERSION 3.2.1)
+cmake_minimum_required(VERSION 3.11)
 
 project(Silent_Pass)
 
@@ -21,6 +21,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DIN_LIBXML")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
 
 ### Git Submodule management ###
+
 find_package(Git REQUIRED)
 if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
 	option(GIT_SUBMODULE "Check submodules during build" ON)
@@ -35,13 +36,9 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
 	endif()
 endif()
 
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/src/utilities/Silent_Log/log.c" OR ${PROJECT_SOURCE_DIR}/src/utilities/Silent_OpenSSL/src)
-	message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
-endif()
-
 ### Includes ### 
 
-include_directories(includes includes/linux includes/utilities includes/win32 includes/lib includes/lib/argtable3 includes/lib/iniparser includes/lib/libyuarel includes/lib/cJSON includes/lib/sqlite3 includes/lib/nss includes/lib/nspr)
+include_directories(includes includes/linux includes/utilities includes/win32)
 
 ### Submodules ###
 include_directories(src/utilities/Silent_Log)
@@ -71,29 +68,29 @@ endif(UNIX)
 add_executable(Silent_Pass ${SOURCES})
 install(TARGETS Silent_Pass DESTINATION bin)
 
-
 ### Libs ###
 
-### Static common libs ###
+### External dependencies ###
 
-set(ARGTABLE_SOURCES "lib/src/argtable3.c")
-add_library(argtable3 STATIC ${ARGTABLE_SOURCES})
-#install(TARGETS argtable3 DESTINATION staticlibs)
+option(ARGTABLE3_ENABLE_TESTS OFF)
+option(ARGTABLE3_ENABLE_EXAMPLES OFF)
+add_subdirectory("extern/argtable3")
 
-set(CJSON_SOURCES "lib/src/cJSON.c")
-add_library(cjson STATIC ${CJSON_SOURCES})
-#install(TARGETS cjson DESTINATION staticlibs)
+option(ENABLE_CJSON_TEST OFF)
+add_subdirectory("extern/cJSON")
+include_directories(cjson PUBLIC  "extern/cJSON")
 
-set(SQLITE3_SOURCES "lib/src/sqlite3.c")
-add_library(sqlite3 STATIC ${SQLITE3_SOURCES})
-#install(TARGETS sqlite3 DESTINATION staticlibs)
+add_library(libyuarel "extern/libyuarel/yuarel.c")
+target_include_directories(libyuarel PUBLIC  "extern/libyuarel")
 
-set(YUAREL_SOURCES "lib/src/yuarel.c")
-add_library(yuarel STATIC ${YUAREL_SOURCES})
-#install(TARGETS yuarel DESTINATION staticlibs)
+add_library(iniparser "extern/iniparser/src/dictionary.c" "extern/iniparser/src/iniparser.c")
+target_include_directories(iniparser PUBLIC "extern/iniparser/src")
 
-target_link_libraries(Silent_Pass cjson sqlite3 argtable3 yuarel)
-
+target_link_libraries(Silent_Pass
+    argtable3
+    cjson
+    libyuarel
+    iniparser)
 
 ### Other libs ###
 
@@ -101,29 +98,36 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 ### Linux libs ###
 if(UNIX)
-	set(INIPARSER_SOURCES "lib/src/iniparser.c" "lib/src/dictionary.c")
-	add_library(iniparser STATIC ${INIPARSER_SOURCES})
-	install(TARGETS iniparser DESTINATION staticlibs)
-
 	find_package(OpenSSL REQUIRED)
 	find_package(Libsecret REQUIRED)
 	find_package(NSS REQUIRED) 
 	find_package(LibXml2 REQUIRED)
+    find_package(SQLite3 REQUIRED)
 
-	#find_library(NSS_LIB NAMES nss nss3)
-	#find_library(SECRET_LIB NAMES secret secret-1)
-
-	include_directories(${OPENSSL_INCLUDE_DIRS} ${LIBSECRET_INCLUDE_DIRS} ${NSS_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIRS})
-	target_link_libraries(Silent_Pass ${OPENSSL_LIBRARIES} ${NSS_LIBRARIES} ${LIBSECRET_LIBRARIES} ${LIBXML2_LIBRARIES} iniparser dl m pthread)
+	include_directories(
+        ${OPENSSL_INCLUDE_DIRS}
+        ${LIBSECRET_INCLUDE_DIRS}
+        ${NSS_INCLUDE_DIRS}
+        ${LIBXML2_INCLUDE_DIRS}
+        ${SQLite3_INCLUDE_DIRS})
+	target_link_libraries(Silent_Pass 
+        ${OPENSSL_LIBRARIES} 
+        ${NSS_LIBRARIES}
+        ${LIBSECRET_LIBRARIES}
+        ${LIBXML2_LIBRARIES}
+        ${SQLite3_LIBRARIES}
+        dl
+        m
+        pthread)
 endif(UNIX)
 
 ### Windows libs ###
-if(WIN32)
-	set(OPENSSL_SOURCES ${CMAKE_SOURCE_DIR}/lib/win32/libcrypto_s.a)
-	set(LIBXML2_SOURCES ${CMAKE_SOURCE_DIR}/lib/win32/libxml2.a)
-	set(LIBZ_SOURCES ${CMAKE_SOURCE_DIR}/lib/win32/libz.a)
-
-	target_link_libraries(Silent_Pass ${LIBXML2_SOURCES})
-	target_link_libraries(Silent_Pass ${LIBZ_SOURCES})
-	target_link_libraries(Silent_Pass ${OPENSSL_SOURCES} crypt32 ws2_32 gdi32 m pthread)
-endif(WIN32)
+#if(WIN32)
+#	set(OPENSSL_SOURCES ${CMAKE_SOURCE_DIR}/lib/win32/libcrypto_s.a)
+#	set(LIBXML2_SOURCES ${CMAKE_SOURCE_DIR}/lib/win32/libxml2.a)
+#	set(LIBZ_SOURCES ${CMAKE_SOURCE_DIR}/lib/win32/libz.a)
+#
+#	target_link_libraries(Silent_Pass ${LIBXML2_SOURCES})
+#	target_link_libraries(Silent_Pass ${LIBZ_SOURCES})
+#	target_link_libraries(Silent_Pass ${OPENSSL_SOURCES} crypt32 ws2_32 gdi32 m pthread)
+#endif(WIN32)
